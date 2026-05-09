@@ -749,12 +749,13 @@ function renderHero(){
 
   const today = new Date();
   const ymNow = today.getFullYear()*100 + today.getMonth();
-  const cicloDoMes = ativos.filter(r => {
-    const d = parseDate(r.DATA_INICIO_CICLO);
+  // Receita do mês = vendas (DATA_INICIO no mês corrente), independente de status atual
+  const vendasMes = rows.filter(r => {
+    const d = parseDate(r.DATA_INICIO);
     return d && (d.getFullYear()*100 + d.getMonth()) === ymNow;
   });
-  $('rec-mes').textContent = fmt(cicloDoMes.reduce((s,r) => s + parseValor(r.VALOR), 0));
-  $('rec-mes-sub').textContent = `${cicloDoMes.length} ciclo${cicloDoMes.length===1?'':'s'} este mês`;
+  $('rec-mes').textContent = fmt(vendasMes.reduce((s,r) => s + parseValor(r.VALOR), 0));
+  $('rec-mes-sub').textContent = `${vendasMes.length} venda${vendasMes.length===1?'':'s'} este mês`;
   $('ativos-n').textContent = ativos.length;
 
   const proximas = ativos.map(r => diasAte(getVenc(r))).filter(d => d != null && d >= 0 && d <= 30);
