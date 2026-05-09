@@ -681,6 +681,11 @@ function escapeHtml(s){
 }
 function statusKey(s){return (s||'').trim().toLowerCase()}
 
+// Vencimento real: usa coluna VENCIMENTO; se vazia, cai pra DATA_INICIO_CICLO (alguns alunos têm a data já preenchida lá)
+function getVenc(r){
+  return parseDate(r.VENCIMENTO) || parseDate(r.DATA_INICIO_CICLO);
+}
+
 const DURACAO = {
   'Trimestral':3,'Semestral':6,'Anual':12,
   'Trimestral Black':6,'Semestral Black':12,'Anual Black':24,
@@ -752,7 +757,7 @@ function renderHero(){
   $('rec-mes-sub').textContent = `${cicloDoMes.length} ciclo${cicloDoMes.length===1?'':'s'} este mês`;
   $('ativos-n').textContent = ativos.length;
 
-  const proximas = ativos.map(r => diasAte(parseDate(r.VENCIMENTO))).filter(d => d != null && d >= 0 && d <= 30);
+  const proximas = ativos.map(r => diasAte(getVenc(r))).filter(d => d != null && d >= 0 && d <= 30);
   $('venc-30').textContent = proximas.length;
   $('venc-30-sub').textContent = proximas.filter(d => d <= 7).length + ' nos próximos 7 dias';
 
@@ -830,7 +835,7 @@ function renderCharts(){
   const bucketByKey = Object.fromEntries(buckets.map(b => [b.key,b]));
   for(const r of rows){
     if((r.STATUS||'').trim() !== 'Ativo') continue;
-    const v = parseDate(r.VENCIMENTO);
+    const v = getVenc(r);
     if(!v) continue;
     const key = `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}`;
     if(bucketByKey[key]){
@@ -859,7 +864,7 @@ function renderCharts(){
 function renderRenewals(){
   const ativos = rows.filter(r => (r.STATUS||'').trim() === 'Ativo');
   const proximas = ativos
-    .map(r => ({...r, dias: diasAte(parseDate(r.VENCIMENTO))}))
+    .map(r => ({...r, dias: diasAte(getVenc(r))}))
     .filter(r => r.dias != null && r.dias >= 0 && r.dias <= 30)
     .sort((a,b) => a.dias - b.dias);
 
@@ -869,7 +874,7 @@ function renderRenewals(){
   $('ren-empty').hidden = proximas.length > 0;
 
   for(const r of proximas){
-    const venc = parseDate(r.VENCIMENTO);
+    const venc = getVenc(r);
     const vencStr = venc ? venc.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '—';
     const valorStr = r.VALOR ? fmtMoney(parseValor(r.VALOR)) : '—';
     const diasLabel = r.dias === 0 ? 'hoje' : (r.dias === 1 ? 'amanhã' : `${r.dias} d`);
@@ -940,8 +945,8 @@ function sortRows(arr){
       return (va - vb) * dir;
     }
     if(dateKeys.has(key)){
-      const da = parseDate(va)?.getTime() ?? 0;
-      const db = parseDate(vb)?.getTime() ?? 0;
+      const da = (key === 'VENCIMENTO' ? getVenc(a) : parseDate(va))?.getTime() ?? 0;
+      const db = (key === 'VENCIMENTO' ? getVenc(b) : parseDate(vb))?.getTime() ?? 0;
       return (da - db) * dir;
     }
     va = String(va||'').toLowerCase(); vb = String(vb||'').toLowerCase();
@@ -968,7 +973,7 @@ function renderStudents(){
 
   const tbody = $('stu-tbody');
   tbody.innerHTML = filtered.map(r => {
-    const venc = parseDate(r.VENCIMENTO);
+    const venc = getVenc(r);
     const vencStr = venc ? fmtDateBR(venc) : '—';
     const valor = parseValor(r.VALOR);
     const status = (r.STATUS||'').trim() || '—';
@@ -1020,7 +1025,7 @@ function openDrawer(r, sourceTr){
   if(r.STATUS) sub.push(r.STATUS);
   $('drawer-sub').textContent = sub.join(' · ') || '—';
 
-  const venc = parseDate(r.VENCIMENTO);
+  const venc = getVenc(r);
   const dias = diasAte(venc);
   const valor = parseValor(r.VALOR);
   const planoMeses = DURACAO[(r.PLANO||'').trim()];
