@@ -27,8 +27,8 @@ window.GARBO_CONFIG = {
   REFRESH_INTERVAL_MIN: 5,
 
   // Marca exibida no header
-  BRAND_NAME: 'Garbo',
-  BRAND_SUFFIX: '.CRM',
+  BRAND_NAME: 'Consultoria Henrique',
+  BRAND_SUFFIX: ' CRM',
 
   // Link do botão "Abrir planilha" da sidebar (substitua se quiser apontar pra outra)
   SHEET_URL: 'https://docs.google.com/spreadsheets/d/19c1cJnNJvlLXI4wRB1HRWrgJxkFTh6dPJPDh2dppALQ/edit',
