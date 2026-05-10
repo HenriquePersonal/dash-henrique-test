@@ -654,6 +654,10 @@ table.data .muted{color:var(--text-mute)}
       <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="m16.24 7.76 2.83-2.83"/><path d="M18 12h4"/><path d="m16.24 16.24 2.83 2.83"/><path d="M12 18v4"/><path d="m7.76 16.24-2.83 2.83"/><path d="M6 12H2"/><path d="m7.76 7.76-2.83-2.83"/></svg>
       Mudar status
     </button>
+    <button class="btn-action danger" id="act-delete" type="button" data-needs-script title="Excluir aluno (não pode ser desfeito)">
+      <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Excluir
+    </button>
   </div>
   <div class="drawer-body" id="drawer-body"></div>
 </aside>
@@ -816,6 +820,35 @@ table.data .muted{color:var(--text-mute)}
     <div class="modal-foot">
       <button type="button" class="btn-cancel" data-close>Cancelar</button>
       <button type="submit" class="btn-submit" form="form-status" id="btn-status-submit">Atualizar status</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: CONFIRMAR EXCLUSÃO -->
+<div class="modal-bg" id="modal-delete" data-modal>
+  <div class="modal" role="dialog" aria-labelledby="modal-delete-title">
+    <div class="modal-head">
+      <div>
+        <h3 id="modal-delete-title">Excluir aluno?</h3>
+        <div class="sub" id="modal-delete-sub">—</div>
+      </div>
+      <button class="drawer-close" data-close type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="padding:1rem 1.25rem;background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.3);border-radius:10px;color:var(--text);font-size:13px;line-height:1.5">
+        Esta ação <b>não pode ser desfeita</b>. A linha será apagada permanentemente da planilha.
+      </div>
+      <div class="field">
+        <label>Confirme digitando o nome do aluno</label>
+        <input id="confirm-name-input" type="text" autocomplete="off" placeholder="">
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn-cancel" data-close>Cancelar</button>
+      <button type="button" class="btn-submit" id="btn-delete-submit" style="background:var(--rose);box-shadow:0 0 14px rgba(251,113,133,.4)" disabled>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+        Excluir
+      </button>
     </div>
   </div>
 </div>
@@ -1678,6 +1711,42 @@ $('form-status').addEventListener('submit', async e => {
     toast(err.message, 'error');
   }finally{
     setBtnLoading(btn, false);
+  }
+});
+
+// ==========================================================================
+// EXCLUIR
+// ==========================================================================
+let deleteTargetName = '';
+$('act-delete').addEventListener('click', () => {
+  const r = rows.find(x => (x.ID || x.NOME) === currentDrawerId);
+  if(!r) return;
+  deleteTargetName = (r.NOME || '').trim();
+  $('modal-delete-sub').textContent = `${r.NOME} · ID ${r.ID || '?'} · ${r.PLANO || '—'}`;
+  $('confirm-name-input').value = '';
+  $('confirm-name-input').placeholder = deleteTargetName;
+  $('btn-delete-submit').disabled = true;
+  openModal('modal-delete');
+  setTimeout(() => $('confirm-name-input').focus(), 100);
+});
+$('confirm-name-input').addEventListener('input', e => {
+  const ok = e.target.value.trim().toLowerCase() === deleteTargetName.toLowerCase();
+  $('btn-delete-submit').disabled = !ok;
+});
+$('btn-delete-submit').addEventListener('click', async () => {
+  const btn = $('btn-delete-submit');
+  setBtnLoading(btn, true);
+  try{
+    await api('delete', {id: currentDrawerId});
+    toast('Aluno excluído');
+    closeModal($('modal-delete'));
+    closeDrawer();
+    setTimeout(() => load(true), 1500);
+  }catch(err){
+    toast(err.message, 'error');
+  }finally{
+    setBtnLoading(btn, false);
+    btn.textContent = 'Excluir';
   }
 });
 

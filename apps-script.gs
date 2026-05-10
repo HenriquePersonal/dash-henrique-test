@@ -50,6 +50,7 @@ function doPost(e) {
       case 'renew':        result = renewAluno(body.id, body.data); break;
       case 'updateStatus': result = updateStatus(body.id, body.data); break;
       case 'update':       result = updateAluno(body.id, body.data); break;
+      case 'delete':       result = deleteAluno(body.id); break;
       default: throw new Error('Ação desconhecida: ' + action);
     }
 
@@ -166,6 +167,15 @@ function updateStatus(id, data) {
 
   applyUpdates(sheet, rowNum, updates);
   return { id, status: data.STATUS };
+}
+
+// Apaga linha do aluno
+function deleteAluno(id) {
+  const sheet = getSheet();
+  const rowNum = findRowById(sheet, id);
+  if (!rowNum) throw new Error('Aluno ID ' + id + ' não encontrado');
+  sheet.deleteRow(rowNum);
+  return { id, deleted: true };
 }
 
 // Atualização genérica de qualquer campo
