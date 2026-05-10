@@ -67,6 +67,15 @@ ID	NOME	DATA_INICIO	PLANO	DATA_INICIO_CICLO	VENCIMENTO	VALOR	FORMA_PGTO	STATUS	O
 
 Esta é a etapa que mais tem detalhe — siga com calma.
 
+> **Se você recebeu uma planilha transferida** (alguém te passou de outra conta): o Apps Script já existe dentro dela, mas foi autorizado pela conta antiga. Você vai precisar **republicar pela sua conta**:
+> 1. Extensões → Apps Script
+> 2. **Implantar → Gerenciar implantações** → ícone de lápis ✏️
+> 3. Em **Executar como** garante que está **Eu** (sua conta atual)
+> 4. **Versão**: troca pra **Nova versão**
+> 5. **Implantar** → autoriza com sua conta (Avançado → Acessar → Permitir)
+> 6. **Copia a nova URL** (pode mudar! confere)
+> 7. Pula direto pro passo 5 (configurar `config.js`)
+
 ### 4.1 Criar o script
 
 1. Na planilha → **Extensões → Apps Script**
