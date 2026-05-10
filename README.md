@@ -4,7 +4,9 @@ Dashboard web pra personal trainer / consultor online gerenciar alunos, renovaç
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fformacaoinss%2Fdash-henrique-test)
 
-> **Setup pela primeira vez?** Use o [`HANDOFF.md`](HANDOFF.md) — passo-a-passo objetivo de 30 min pra rodar na sua conta.
+> **Setup pela primeira vez?**
+> - **Manual**: siga o [`HANDOFF.md`](HANDOFF.md) — passo-a-passo objetivo de 30 min
+> - **Com Claude Code**: clone este repo, abra com `claude` → o [`CLAUDE.md`](CLAUDE.md) instrui o Claude a te guiar interativamente passo a passo
 
 ## O que tem
 
