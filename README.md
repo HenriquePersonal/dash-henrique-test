@@ -4,6 +4,8 @@ Dashboard web pra personal trainer / consultor online gerenciar alunos, renovaç
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fformacaoinss%2Fdash-henrique-test)
 
+> **Setup pela primeira vez?** Use o [`HANDOFF.md`](HANDOFF.md) — passo-a-passo objetivo de 30 min pra rodar na sua conta.
+
 ## O que tem
 
 - **Visão geral**: MRR, receita do mês, vendas novas vs renovações, taxa de renovação, churn 30d, vida média do aluno
@@ -11,7 +13,7 @@ Dashboard web pra personal trainer / consultor online gerenciar alunos, renovaç
 - **Próximas renovações** (30 dias)
 - **Tabela completa** de alunos com busca, filtros (plano, origem, status, intervalo de datas), ordenação, export CSV
 - **Detalhes do aluno** em painel lateral com todos os campos
-- **Ações** (requer Apps Script): cadastrar novo aluno, registrar renovação, mudar status — direto do dash
+- **Ações** (requer Apps Script): cadastrar, renovar, mudar status, excluir aluno — direto do dash
 - **Charts** clicáveis (filtram a tabela)
 - Tema claro / escuro
 - 100% responsivo (desktop + celular)
@@ -135,6 +137,15 @@ Em ~30s você terá uma URL tipo `https://seu-projeto.vercel.app`. Cada `git pus
    - **Cancelado**: pede motivo
 4. Atualiza `ULTIMA_INTERACAO` automaticamente
 
+### Excluir aluno
+
+1. Clicar no aluno
+2. Botão vermelho **Excluir**
+3. Digitar o nome do aluno pra confirmar (proteção contra acidente)
+4. Confirma → linha removida da planilha permanentemente
+
+> ⚠️ **Não pode ser desfeito.** Se errar, o jeito é cadastrar de novo manualmente.
+
 ## Notas importantes
 
 - **Cache do CSV**: o Google publica com cache de ~5 minutos. Edições na planilha demoram até 5 min pra aparecer no dash. Use o botão **Atualizar** pra forçar nova busca (mas se o cache do Google ainda tá velho, vai vir velho).
@@ -168,6 +179,56 @@ dashboard/
 ├── apps-script.gs    # código pra colar no Apps Script da planilha
 └── README.md         # este arquivo
 ```
+
+## Atualizar o código depois do setup
+
+### Atualizar o frontend (HTML/CSS/JS)
+Edita os arquivos no GitHub → commit → Vercel redeploya sozinho em ~30s.
+
+### Atualizar o Apps Script
+Mudar o `apps-script.gs` no GitHub **não atualiza** automaticamente o que está rodando no Google. Precisa publicar manualmente:
+
+1. Cole o novo código no editor do Apps Script (substitui tudo)
+2. **Ctrl+S** pra salvar
+3. **Implantar → Gerenciar implantações**
+4. Ícone de **lápis ✏️** na implantação ativa
+5. Em **Versão**, troca pra **"Nova versão"**
+6. **Implantar**
+7. ✅ A URL **não muda** — `config.js` continua funcionando
+
+> Se você adicionar novos endpoints (ex: nova ação `delete`) e esquecer de fazer "Nova versão", o dash vai dar erro `"Ação desconhecida"` ao chamar.
+
+## Roadmap — próximas melhorias
+
+Ideias pra evoluir, em ordem de impacto:
+
+### Quick wins
+- [ ] **Editar dados do aluno** — corrigir nome/valor errado direto no dash (hoje só dá pra renovar/mudar status, não editar campos arbitrários). Endpoint `update` já existe no Apps Script — só falta UI.
+- [ ] **Histórico de pagamentos** — cada renovação vira linha numa aba `TRANSACOES` com data/valor/plano. Permite ver receita real ao longo do tempo, não só o contador `RENOVOU_VEZES`.
+- [ ] **Senha simples no Apps Script** — adicionar campo `secret` no payload e validar no `doPost`. Evita que qualquer um com a URL escreva. Hoje o endpoint é totalmente público.
+
+### Operacionais
+- [ ] **Notificações automáticas** — Apps Script com trigger diário que manda WhatsApp/email pra alunos vencendo em 7 dias (via API tipo Twilio, Z-API, etc.)
+- [ ] **Link público de auto-cadastro** — formulário que o aluno preenche, cai como "pendente" na planilha, você confirma com 1 clique
+- [ ] **Webhook de pagamento** — quando o pix/cartão entra (via Mercado Pago, Stripe), atualiza automático
+- [ ] **Modo "agir agora" em destaque** — primeira tela do dash mostra só sumidos + vencendo hoje + congelados expirando
+
+### Análise
+- [ ] **Comparativo trimestral / anual** — não só mês a mês
+- [ ] **Cohorts** — quantos % dos alunos que entraram em jan/2025 ainda estão ativos hoje?
+- [ ] **LTV real** — receita acumulada por aluno (precisa do histórico de transações)
+- [ ] **Previsão de receita** — projeção baseada em renovações esperadas
+
+### UX
+- [ ] **Dashboard mobile dedicado** — drawer ocupa tela inteira, botões maiores
+- [ ] **Atalhos de teclado** (`/` pra busca, `n` pra novo aluno, `esc` fecha modal)
+- [ ] **Multi-tenant** — vários personals usando a mesma instância (cada um vê só seus alunos)
+
+## Privacidade & segurança
+
+- O **CSV publicado** é totalmente público. Qualquer pessoa com a URL vê os dados dos alunos. Trate a URL como semi-secreta.
+- O **Apps Script com "Qualquer pessoa"** é endpoint público — qualquer um com a URL pode chamar `create`/`renew`/`updateStatus`/`delete`. Pra produção real, considerar adicionar uma chave secreta no payload (item do roadmap acima).
+- O **repo é público** — não coloque dados sensíveis (telefones, emails, observações pessoais) nele. Esses dados ficam só na planilha, não no código.
 
 ## Licença
 
