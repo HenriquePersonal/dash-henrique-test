@@ -1730,7 +1730,8 @@ $('act-delete').addEventListener('click', () => {
   setTimeout(() => $('confirm-name-input').focus(), 100);
 });
 $('confirm-name-input').addEventListener('input', e => {
-  const ok = e.target.value.trim().toLowerCase() === deleteTargetName.toLowerCase();
+  const norm = s => String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
+  const ok = norm(e.target.value) === norm(deleteTargetName);
   $('btn-delete-submit').disabled = !ok;
 });
 $('btn-delete-submit').addEventListener('click', async () => {
