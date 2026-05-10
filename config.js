@@ -19,7 +19,7 @@ window.GARBO_CONFIG = {
   //   → Executar como: Eu / Quem pode acessar: Qualquer pessoa
   //   → Implantar → copiar URL aqui (termina em /exec)
   // Se não configurado, os botões de ação ficam desabilitados (modo somente-leitura).
-  APPS_SCRIPT_URL: '',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxS8iR8RQpYCPaeoKGPfB6K2lTA7lOGzZd2vy9r9kGUtCarwXPYij225A14zbFfkUW67g/exec',
 
   // ----- Não precisa mexer daqui pra baixo -----
 
