@@ -884,12 +884,14 @@ let sortBy = 'NOME';
 let sortDir = 1;
 const selected = new Set();
 
-async function load(){
+async function load(forceFresh){
   const btn = $('refresh');
   $('refresh-ic').classList.add('spin'); btn.disabled = true;
   $('error').hidden = true;
   try{
-    const res = await fetch(CSV_URL, {cache:'no-store'});
+    // cache-buster: ?cb=timestamp força o Google a servir versão mais nova
+    const url = forceFresh ? CSV_URL + (CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now() : CSV_URL;
+    const res = await fetch(url, {cache:'no-store'});
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const text = await res.text();
     const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
@@ -1457,8 +1459,8 @@ function updateThemeIcon(){
 }
 
 // EVENTS
-$('refresh').addEventListener('click', load);
-$('retry').addEventListener('click', load);
+$('refresh').addEventListener('click', () => load(true));
+$('retry').addEventListener('click', () => load(true));
 $('search').addEventListener('input', e => {filters.search = e.target.value; renderStudents()});
 $('filter-plano').addEventListener('change', e => {filters.plano = e.target.value; renderStudents()});
 $('filter-origem').addEventListener('change', e => {filters.origem = e.target.value; renderStudents()});
@@ -1594,7 +1596,7 @@ $('form-new').addEventListener('submit', async e => {
     const res = await api('create', {data});
     toast(`Aluno cadastrado (ID ${res.id})`);
     closeModal($('modal-new'));
-    setTimeout(load, 800); // espera Sheets propagar e recarrega
+    setTimeout(() => load(true), 1500); // espera Sheets propagar e recarrega com cache-buster
   }catch(err){
     toast(err.message, 'error');
   }finally{
@@ -1635,7 +1637,7 @@ $('form-renew').addEventListener('submit', async e => {
     toast('Renovação registrada');
     closeModal($('modal-renew'));
     closeDrawer();
-    setTimeout(load, 800);
+    setTimeout(() => load(true), 1500);
   }catch(err){
     toast(err.message, 'error');
   }finally{
@@ -1671,7 +1673,7 @@ $('form-status').addEventListener('submit', async e => {
     toast('Status atualizado');
     closeModal($('modal-status'));
     closeDrawer();
-    setTimeout(load, 800);
+    setTimeout(() => load(true), 1500);
   }catch(err){
     toast(err.message, 'error');
   }finally{
