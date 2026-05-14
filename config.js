@@ -23,6 +23,13 @@ window.GARBO_CONFIG = {
 
   // ----- Não precisa mexer daqui pra baixo -----
 
+  // Token enviado em toda chamada à API (deve bater com SECRET_TOKEN no Apps Script)
+  API_TOKEN: '6867772bb7b317013dec88bcaba72f73eaf38c53',
+
+  // Credenciais de acesso ao dashboard (senha armazenada como SHA-256 — nunca texto puro)
+  LOGIN_EMAIL: 'nunesbispo011@gmail.com',
+  LOGIN_PASS_HASH: 'ff345f38f6b9a6803b61d9d3eb5b4dad8369e7b1516f4317a7025a4fc7447320',
+
   // Cache do CSV: tempo entre auto-refreshes (em minutos)
   REFRESH_INTERVAL_MIN: 5,
 

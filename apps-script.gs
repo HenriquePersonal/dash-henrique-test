@@ -21,6 +21,7 @@
 // ==========================================================================
 
 const SHEET_NAME = 'ALUNOS';
+const SECRET_TOKEN = '6867772bb7b317013dec88bcaba72f73eaf38c53';
 
 // Headers da aba ALUNOS — ordem importa, não mexer
 const HEADERS = [
@@ -43,6 +44,9 @@ const DURACAO = {
 function doPost(e) {
   try {
     const body = JSON.parse(e.postData.contents);
+    if (body.token !== SECRET_TOKEN) {
+      return jsonResponse({ ok: false, error: 'Não autorizado' });
+    }
     const action = body.action;
     let result;
 
