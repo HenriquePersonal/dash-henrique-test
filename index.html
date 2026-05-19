@@ -252,6 +252,35 @@ table.data .muted{color:var(--text-mute)}
 
 .empty{padding:2rem;text-align:center;color:var(--text-fade);font-size:13px}
 
+/* NOVOS DO MÊS */
+.novos-nav{display:flex;align-items:center;gap:.65rem}
+.novos-nav button{width:28px;height:28px;display:grid;place-items:center;background:var(--elevated);border:1px solid var(--border);color:var(--text-mute);border-radius:7px;font-size:14px;transition:color 200ms var(--ease),background-color 200ms var(--ease)}
+.novos-nav button:hover{color:var(--text);background:var(--hover-strong)}
+.novos-label{font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--text);min-width:120px;text-align:center}
+.novos-resumo{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border)}
+@media (max-width:640px){.novos-resumo{grid-template-columns:1fr 1fr}}
+.novos-kpi{background:var(--elevated);border:1px solid var(--border);border-radius:10px;padding:.85rem 1rem}
+.novos-kpi .lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-fade);font-weight:600;margin-bottom:.35rem}
+.novos-kpi .v{font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--text);letter-spacing:-.01em}
+.novos-kpi .v.green{color:var(--emerald)}
+.novos-kpi .sub{font-size:11px;color:var(--text-mute);margin-top:.2rem}
+.novos-list{padding:.25rem 0}
+.novos-row{display:grid;grid-template-columns:1.8fr .9fr .9fr .8fr .9fr;gap:1rem;padding:13px 1.5rem;align-items:center;border-bottom:1px solid var(--border-soft);cursor:pointer;transition:background-color 200ms var(--ease)}
+.novos-row:hover{background:var(--hover)}
+.novos-row .nm{font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.novos-row .dt{font-family:var(--font-mono);font-size:12px;color:var(--text-mute)}
+.novos-row .pl{font-size:12px;color:var(--text-mute)}
+.novos-row .vl{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text);text-align:right}
+.novos-row .orig{font-size:11px;color:var(--text-fade);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.novos-thead{display:grid;grid-template-columns:1.8fr .9fr .9fr .8fr .9fr;gap:1rem;padding:8px 1.5rem;background:var(--hover);border-bottom:1px solid var(--border)}
+.novos-thead span{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text-fade)}
+.novos-thead span:nth-child(4),.novos-thead span:nth-child(5){text-align:right}
+@media (max-width:640px){
+  .novos-row{grid-template-columns:1fr auto;gap:.5rem;padding:1rem 1.25rem}
+  .novos-row .dt,.novos-row .orig{display:none}
+  .novos-thead{display:none}
+}
+
 /* TWO COLS GRID for hoje/semana */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
 @media (max-width:900px){.two-col{grid-template-columns:1fr}}
@@ -464,6 +493,7 @@ table.data .muted{color:var(--text-mute)}
       <a href="#sec-followup"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>Follow-up</a>
       <a href="#sec-renewals"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.6 0 4.95 1.1 6.6 2.85"/><path d="M21 3v6h-6"/></svg>Renovações</a>
       <a href="#sec-students"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><circle cx="17" cy="9" r="3"/><path d="M21 21v-1a4 4 0 0 0-3-3.87"/></svg>Alunos</a>
+      <a href="#sec-novos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/><path d="M19 8v6"/></svg>Novos do mês</a>
 
       <div class="nav-header">Análise</div>
       <a href="#sec-history"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>Histórico</a>
@@ -490,6 +520,7 @@ table.data .muted{color:var(--text-mute)}
         <a href="#sec-followup">Follow-up</a>
         <a href="#sec-history">Histórico</a>
         <a href="#sec-students">Alunos</a>
+        <a href="#sec-novos">Novos</a>
       </nav>
       <div class="header-spacer"></div>
       <div class="search-box">
@@ -635,6 +666,42 @@ table.data .muted{color:var(--text-mute)}
           <div class="panel-title">Top alunos <span class="count">por renovações</span></div>
         </div>
         <div class="top-list" id="top-list"></div>
+      </section>
+
+      <!-- NOVOS DO MÊS -->
+      <section class="panel" id="sec-novos" aria-label="Novos alunos do mês">
+        <div class="panel-head">
+          <div class="panel-title">Novos do mês <span class="count" id="novos-count"></span></div>
+          <div class="panel-tools">
+            <div class="novos-nav">
+              <button id="novos-prev" type="button" aria-label="Mês anterior">‹</button>
+              <span class="novos-label" id="novos-label">—</span>
+              <button id="novos-next" type="button" aria-label="Próximo mês">›</button>
+            </div>
+          </div>
+        </div>
+        <div class="novos-resumo">
+          <div class="novos-kpi">
+            <div class="lbl">Alunos novos</div>
+            <div class="v green" id="novos-kpi-total">—</div>
+            <div class="sub">primeira contratação</div>
+          </div>
+          <div class="novos-kpi">
+            <div class="lbl">Receita do mês</div>
+            <div class="v" id="novos-kpi-receita">—</div>
+            <div class="sub">soma dos valores</div>
+          </div>
+          <div class="novos-kpi">
+            <div class="lbl">Ticket médio</div>
+            <div class="v" id="novos-kpi-ticket">—</div>
+            <div class="sub">receita ÷ alunos</div>
+          </div>
+        </div>
+        <div class="novos-thead">
+          <span>Nome</span><span>Início</span><span>Plano</span><span>Valor</span><span>Origem</span>
+        </div>
+        <div class="novos-list" id="novos-list"></div>
+        <div class="empty" id="novos-empty" hidden>Nenhum aluno novo neste mês.</div>
       </section>
 
       <!-- STUDENTS TABLE -->
@@ -1095,6 +1162,7 @@ function renderAll(){
   renderStatusChips();
   renderStudents();
   renderDataQuality();
+  renderNovosMes();
 }
 
 // SUMMARY
@@ -1377,6 +1445,70 @@ function renderTopAlunos(){
   }
 }
 
+// NOVOS DO MÊS
+let novosOffset = 0; // 0 = mês atual, -1 = mês anterior, etc.
+
+const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function renderNovosMes(){
+  const ref = new Date();
+  ref.setDate(1);
+  ref.setMonth(ref.getMonth() + novosOffset);
+  const mesAlvo = ref.getMonth();
+  const anoAlvo = ref.getFullYear();
+
+  $('novos-label').textContent = `${MESES_PT[mesAlvo]} ${anoAlvo}`;
+  $('novos-next').disabled = novosOffset >= 0;
+  $('novos-next').style.opacity = novosOffset >= 0 ? '.35' : '1';
+
+  const novos = rows.filter(r => {
+    if (Number(r.RENOVOU_VEZES || 0) !== 0) return false;
+    const d = parseDate(r.DATA_INICIO);
+    return d && d.getMonth() === mesAlvo && d.getFullYear() === anoAlvo;
+  });
+
+  $('novos-count').textContent = novos.length ? `(${novos.length})` : '';
+
+  const receita = novos.reduce((s, r) => s + parseValor(r.VALOR), 0);
+  const ticket = novos.length ? receita / novos.length : 0;
+
+  $('novos-kpi-total').textContent = novos.length;
+  $('novos-kpi-receita').textContent = `R$ ${fmt(receita)}`;
+  $('novos-kpi-ticket').textContent = novos.length ? `R$ ${fmt(ticket)}` : '—';
+
+  $('novos-empty').hidden = novos.length > 0;
+  $('novos-list').innerHTML = '';
+
+  if (novos.length) {
+    novos.sort((a, b) => {
+      const da = parseDate(a.DATA_INICIO) || new Date(0);
+      const db = parseDate(b.DATA_INICIO) || new Date(0);
+      return db - da;
+    });
+    $('novos-list').innerHTML = novos.map(r => {
+      const valor = parseValor(r.VALOR) ? `R$ ${fmt(parseValor(r.VALOR))}` : '—';
+      const data = fmtDateBR(parseDate(r.DATA_INICIO));
+      const plano = r.PLANO || '—';
+      const origem = r.ORIGEM || '—';
+      return `<div class="novos-row" data-id="${escapeHtml(r.ID || r.NOME)}">
+        <div class="nm">${escapeHtml(r.NOME)}</div>
+        <div class="dt">${escapeHtml(data)}</div>
+        <div class="pl">${escapeHtml(plano)}</div>
+        <div class="vl">${escapeHtml(valor)}</div>
+        <div class="orig">${escapeHtml(origem)}</div>
+      </div>`;
+    }).join('');
+
+    for (const row of $('novos-list').querySelectorAll('.novos-row')) {
+      row.addEventListener('click', () => {
+        const id = row.dataset.id;
+        const r = rows.find(x => (x.ID || x.NOME) === id);
+        if (r) openDrawer(r);
+      });
+    }
+  }
+}
+
 // DATA QUALITY
 function renderDataQuality(){
   const ativos = rows.filter(r => (r.STATUS||'').trim() === 'Ativo');
@@ -1633,6 +1765,8 @@ function updateThemeIcon(){
 // EVENTS
 $('refresh').addEventListener('click', () => load(true));
 $('retry').addEventListener('click', () => load(true));
+$('novos-prev').addEventListener('click', () => { novosOffset--; renderNovosMes(); });
+$('novos-next').addEventListener('click', () => { if(novosOffset < 0){ novosOffset++; renderNovosMes(); } });
 $('search').addEventListener('input', e => {filters.search = e.target.value; renderStudents()});
 $('filter-plano').addEventListener('change', e => {filters.plano = e.target.value; renderStudents()});
 $('filter-origem').addEventListener('change', e => {filters.origem = e.target.value; renderStudents()});

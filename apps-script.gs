@@ -56,6 +56,7 @@ function doPost(e) {
       case 'updateStatus': result = updateStatus(body.id, body.data); break;
       case 'update':       result = updateAluno(body.id, body.data); break;
       case 'delete':       result = deleteAluno(body.id); break;
+      case 'novosMes':     result = novosMes(body.mes, body.ano); break;
       default: throw new Error('Ação desconhecida: ' + action);
     }
 
@@ -172,6 +173,47 @@ function updateStatus(id, data) {
 
   applyUpdates(sheet, rowNum, updates);
   return { id, status: data.STATUS };
+}
+
+// Retorna alunos cujo DATA_INICIO é no mês/ano informado (ou mês atual se omitido)
+function novosMes(mes, ano) {
+  const sheet = getSheet();
+  const hoje = new Date();
+  const mesAlvo = mes != null ? Number(mes) - 1 : hoje.getMonth(); // recebe 1-12, converte p/ 0-11
+  const anoAlvo = ano != null ? Number(ano) : hoje.getFullYear();
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return { alunos: [], total: 0, receita: 0, mes: mesAlvo + 1, ano: anoAlvo };
+
+  const dados = sheet.getRange(2, 1, lastRow - 1, HEADERS.length).getValues();
+
+  const idxDataInicio = HEADERS.indexOf('DATA_INICIO');
+  const idxValor      = HEADERS.indexOf('VALOR');
+
+  const alunos = [];
+  let receita = 0;
+
+  dados.forEach(row => {
+    const raw = String(row[idxDataInicio] || '').trim();
+    if (!raw) return;
+    let d;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(raw)) {
+      const [dia, m, a] = raw.split('/').map(Number);
+      d = new Date(a, m - 1, dia);
+    } else {
+      d = new Date(raw);
+    }
+    if (isNaN(d) || d.getMonth() !== mesAlvo || d.getFullYear() !== anoAlvo) return;
+
+    const obj = {};
+    HEADERS.forEach((h, i) => { obj[h] = row[i]; });
+    alunos.push(obj);
+
+    const v = parseFloat(String(row[idxValor] || '0').replace(/\D/g, '')) || 0;
+    receita += v;
+  });
+
+  return { alunos, total: alunos.length, receita, mes: mesAlvo + 1, ano: anoAlvo };
 }
 
 // Apaga linha do aluno
