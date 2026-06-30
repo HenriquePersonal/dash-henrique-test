@@ -21,7 +21,10 @@
 // ==========================================================================
 
 const SHEET_NAME = 'ALUNOS';
+const LEADS_SHEET_NAME = 'LEADS';
 const SECRET_TOKEN = '6867772bb7b317013dec88bcaba72f73eaf38c53';
+
+const LEADS_HEADERS = ['ID','NOME','TELEFONE','ORIGEM','DATA_CONTATO','STATUS','OBSERVACOES'];
 
 // Headers da aba ALUNOS — ordem importa, não mexer
 const HEADERS = [
@@ -57,6 +60,9 @@ function doPost(e) {
       case 'update':       result = updateAluno(body.id, body.data); break;
       case 'delete':       result = deleteAluno(body.id); break;
       case 'novosMes':     result = novosMes(body.mes, body.ano); break;
+      case 'addLead':      result = addLead(body.data); break;
+      case 'updateLead':   result = updateLead(body.id, body.data); break;
+      case 'deleteLead':   result = deleteLead(body.id); break;
       default: throw new Error('Ação desconhecida: ' + action);
     }
 
@@ -232,6 +238,70 @@ function updateAluno(id, data) {
   if (!rowNum) throw new Error('Aluno ID ' + id + ' não encontrado');
   applyUpdates(sheet, rowNum, data);
   return { id };
+}
+
+// ==========================================================================
+// HELPERS
+// ==========================================================================
+
+// ==========================================================================
+// LEADS
+// ==========================================================================
+
+function getLeadsSheet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LEADS_SHEET_NAME);
+  if (!sheet) throw new Error('Aba "' + LEADS_SHEET_NAME + '" não encontrada na planilha');
+  return sheet;
+}
+
+function getLastLeadId(sheet) {
+  const last = sheet.getLastRow();
+  if (last < 2) return 0;
+  const ids = sheet.getRange(2, 1, last - 1, 1).getValues().flat();
+  return Math.max(...ids.map(v => Number(v) || 0), 0);
+}
+
+function findLeadRowById(sheet, id) {
+  const last = sheet.getLastRow();
+  if (last < 2) return null;
+  const ids = sheet.getRange(2, 1, last - 1, 1).getValues().flat();
+  const idx = ids.findIndex(v => String(v) === String(id));
+  return idx >= 0 ? idx + 2 : null;
+}
+
+function addLead(data) {
+  const sheet = getLeadsSheet();
+  const newId = getLastLeadId(sheet) + 1;
+  const hoje = formatDate(new Date());
+  const row = LEADS_HEADERS.map(h => {
+    switch (h) {
+      case 'ID':           return newId;
+      case 'DATA_CONTATO': return data.DATA_CONTATO || hoje;
+      case 'STATUS':       return data.STATUS || 'Em negociação';
+      default:             return data[h] || '';
+    }
+  });
+  sheet.appendRow(row);
+  return { id: newId };
+}
+
+function updateLead(id, data) {
+  const sheet = getLeadsSheet();
+  const rowNum = findLeadRowById(sheet, id);
+  if (!rowNum) throw new Error('Lead ID ' + id + ' não encontrado');
+  for (const [key, val] of Object.entries(data)) {
+    const col = LEADS_HEADERS.indexOf(key) + 1;
+    if (col > 0) sheet.getRange(rowNum, col).setValue(val);
+  }
+  return { id };
+}
+
+function deleteLead(id) {
+  const sheet = getLeadsSheet();
+  const rowNum = findLeadRowById(sheet, id);
+  if (!rowNum) throw new Error('Lead ID ' + id + ' não encontrado');
+  sheet.deleteRow(rowNum);
+  return { id, deleted: true };
 }
 
 // ==========================================================================

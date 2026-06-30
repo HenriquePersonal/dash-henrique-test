@@ -494,6 +494,7 @@ table.data .muted{color:var(--text-mute)}
       <a href="#sec-renewals"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.6 0 4.95 1.1 6.6 2.85"/><path d="M21 3v6h-6"/></svg>Renovações</a>
       <a href="#sec-students"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><circle cx="17" cy="9" r="3"/><path d="M21 21v-1a4 4 0 0 0-3-3.87"/></svg>Alunos</a>
       <a href="#sec-novos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/><path d="M19 8v6"/></svg>Novos do mês</a>
+      <a href="#sec-leads"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Leads</a>
 
       <div class="nav-header">Análise</div>
       <a href="#sec-history"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>Histórico</a>
@@ -521,6 +522,7 @@ table.data .muted{color:var(--text-mute)}
         <a href="#sec-history">Histórico</a>
         <a href="#sec-students">Alunos</a>
         <a href="#sec-novos">Novos</a>
+        <a href="#sec-leads">Leads</a>
       </nav>
       <div class="header-spacer"></div>
       <div class="search-box">
@@ -751,6 +753,60 @@ table.data .muted{color:var(--text-mute)}
             </thead>
             <tbody id="stu-tbody"></tbody>
           </table>
+        </div>
+      </section>
+
+      <!-- LEADS -->
+      <section class="panel" id="sec-leads" aria-label="Leads do mês">
+        <div class="panel-head">
+          <div class="panel-title">Leads <span class="count" id="leads-count"></span></div>
+          <div class="panel-tools">
+            <select id="leads-filter-status" style="font-size:12px;padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text)">
+              <option value="">Todos os status</option>
+              <option>Em negociação</option>
+              <option>Fechou</option>
+              <option>Perdido</option>
+              <option>Sem retorno</option>
+            </select>
+            <select id="leads-filter-origem" style="font-size:12px;padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text)">
+              <option value="">Todas as origens</option>
+              <option>Instagram</option>
+              <option>Indicação</option>
+              <option>Desafio</option>
+              <option>Tráfego</option>
+              <option>Outros</option>
+            </select>
+            <button class="cta" id="btn-new-lead" type="button" data-needs-script style="font-size:12px;padding:.3rem .8rem">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Novo lead
+            </button>
+          </div>
+        </div>
+        <div class="kpi-strip" id="leads-kpis" style="margin-bottom:1rem">
+          <div class="mini"><div class="lbl">Total</div><div class="v" id="leads-total">—</div><div class="sub">todos os leads</div></div>
+          <div class="mini"><div class="lbl">Em negociação</div><div class="v amber" id="leads-negociacao">—</div><div class="sub">aguardando decisão</div></div>
+          <div class="mini"><div class="lbl">Convertidos</div><div class="v green" id="leads-fechou">—</div><div class="sub">fecharam plano</div></div>
+          <div class="mini"><div class="lbl">Taxa de conv.</div><div class="v" id="leads-taxa">—</div><div class="sub">fechou / total</div></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Origem</th>
+                <th>Data de contato</th>
+                <th>Status</th>
+                <th>Observações</th>
+                <th style="width:80px"></th>
+              </tr>
+            </thead>
+            <tbody id="leads-tbody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="leads-empty" hidden>Nenhum lead cadastrado ainda. Clique em "Novo lead" para começar.</div>
+        <div class="empty" id="leads-no-csv" hidden style="color:var(--amber)">
+          ⚠️ Configure <b>LEADS_CSV_URL</b> em config.js para visualizar os leads. Publique a aba LEADS da planilha como CSV (Arquivo → Compartilhar → Publicar na web → aba LEADS → CSV).
         </div>
       </section>
 
@@ -991,6 +1047,68 @@ table.data .muted{color:var(--text-mute)}
   </div>
 </div>
 
+<!-- MODAL: NOVO LEAD -->
+<div class="modal-bg" id="modal-new-lead" data-modal>
+  <div class="modal" role="dialog" aria-labelledby="modal-lead-title">
+    <div class="modal-head">
+      <div>
+        <h3 id="modal-lead-title">Novo lead</h3>
+        <div class="sub">registra interesse de um novo contato</div>
+      </div>
+      <button class="drawer-close" data-close type="button" aria-label="Fechar">×</button>
+    </div>
+    <form id="form-new-lead" class="modal-body">
+      <div class="field">
+        <label class="required">Nome</label>
+        <input name="NOME" required placeholder="Nome completo">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Telefone</label>
+          <input name="TELEFONE" type="tel" placeholder="5511999999999">
+        </div>
+        <div class="field">
+          <label>Data de contato</label>
+          <input name="DATA_CONTATO" type="date">
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Origem</label>
+          <select name="ORIGEM">
+            <option value="">—</option>
+            <option>Instagram</option>
+            <option>Indicação</option>
+            <option>Desafio</option>
+            <option>Tráfego</option>
+            <option>Outros</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select name="STATUS">
+            <option>Em negociação</option>
+            <option>Fechou</option>
+            <option>Perdido</option>
+            <option>Sem retorno</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Observações</label>
+        <textarea name="OBSERVACOES" placeholder="ex: viu reels da Paloma, quer começar em agosto…"></textarea>
+      </div>
+    </form>
+    <div class="modal-foot">
+      <button type="button" class="btn-cancel" data-close>Cancelar</button>
+      <button type="submit" class="btn-submit" form="form-new-lead" id="btn-lead-submit">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M20 6 9 17l-5-5"/></svg>
+        Cadastrar lead
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -999,6 +1117,7 @@ table.data .muted{color:var(--text-mute)}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script>
 const CFG = window.GARBO_CONFIG || {};
+const LEADS_CSV_URL = CFG.LEADS_CSV_URL || '';
 
 // ==========================================================================
 // AUTH
@@ -1072,6 +1191,60 @@ const APPS_SCRIPT_URL = CFG.APPS_SCRIPT_URL || '';
 const REFRESH_MIN = CFG.REFRESH_INTERVAL_MIN || 5;
 
 const $ = id => document.getElementById(id);
+// LEADS
+let leadsRows = [];
+const leadsFilters = { status: '', origem: '' };
+
+async function loadLeads(){
+  if(!LEADS_CSV_URL){
+    $('leads-no-csv').hidden = false;
+    $('leads-empty').hidden = true;
+    return;
+  }
+  $('leads-no-csv').hidden = true;
+  try{
+    const url = LEADS_CSV_URL + (LEADS_CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+    leadsRows = (parsed.data || []).filter(r => (r.NOME || '').trim());
+    renderLeads();
+  }catch(err){
+    console.error('Leads:', err);
+  }
+}
+
+function renderLeads(){
+  let filtered = leadsRows;
+  if(leadsFilters.status) filtered = filtered.filter(r => (r.STATUS||'') === leadsFilters.status);
+  if(leadsFilters.origem) filtered = filtered.filter(r => (r.ORIGEM||'') === leadsFilters.origem);
+
+  $('leads-count').textContent = `(${filtered.length})`;
+  $('leads-total').textContent = leadsRows.length;
+  $('leads-negociacao').textContent = leadsRows.filter(r => r.STATUS === 'Em negociação').length;
+  const fechou = leadsRows.filter(r => r.STATUS === 'Fechou').length;
+  $('leads-fechou').textContent = fechou;
+  $('leads-taxa').textContent = leadsRows.length ? Math.round(fechou / leadsRows.length * 100) + '%' : '—';
+
+  const STATUS_CLS = {'em negociação':'amber','fechou':'ativo','perdido':'cancelado','sem retorno':'vencido'};
+  const tbody = $('leads-tbody');
+  $('leads-empty').hidden = filtered.length > 0;
+  tbody.innerHTML = filtered.map(r => {
+    const sk = (r.STATUS||'').toLowerCase();
+    const cls = STATUS_CLS[sk] || '';
+    return `<tr>
+      <td class="nome">${escapeHtml(r.NOME||'—')}</td>
+      <td class="mono muted">${escapeHtml(r.TELEFONE||'—')}</td>
+      <td class="muted">${escapeHtml(r.ORIGEM||'—')}</td>
+      <td class="mono muted">${escapeHtml(r.DATA_CONTATO||'—')}</td>
+      <td><span class="status ${cls}"><span class="dot"></span>${escapeHtml(r.STATUS||'—')}</span></td>
+      <td class="muted" style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escapeHtml(r.OBSERVACOES||'')}">${escapeHtml(r.OBSERVACOES||'—')}</td>
+      <td></td>
+    </tr>`;
+  }).join('');
+}
+
 const fmt = n => Math.round(n).toLocaleString('pt-BR');
 const fmtMoney = n => 'R$ ' + fmt(n);
 function parseValor(v){
@@ -1763,7 +1936,7 @@ function updateThemeIcon(){
 }
 
 // EVENTS
-$('refresh').addEventListener('click', () => load(true));
+$('refresh').addEventListener('click', () => { load(true); loadLeads(); });
 $('retry').addEventListener('click', () => load(true));
 $('novos-prev').addEventListener('click', () => { novosOffset--; renderNovosMes(); });
 $('novos-next').addEventListener('click', () => { if(novosOffset < 0){ novosOffset++; renderNovosMes(); } });
@@ -1803,6 +1976,31 @@ $('bulk-export').addEventListener('click', () => {
 $('drawer-close').addEventListener('click', closeDrawer);
 $('drawer-bg').addEventListener('click', closeDrawer);
 $('theme-toggle').addEventListener('click', toggleTheme);
+$('leads-filter-status').addEventListener('change', e => { leadsFilters.status = e.target.value; renderLeads(); });
+$('leads-filter-origem').addEventListener('change', e => { leadsFilters.origem = e.target.value; renderLeads(); });
+$('btn-new-lead').addEventListener('click', () => {
+  const f = $('form-new-lead');
+  f.reset();
+  f.elements.DATA_CONTATO.value = new Date().toISOString().slice(0,10);
+  openModal('modal-new-lead');
+  setTimeout(() => f.elements.NOME.focus(), 100);
+});
+$('form-new-lead').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('btn-lead-submit');
+  const data = formData(e.target);
+  setBtnLoading(btn, true);
+  try{
+    const res = await api('addLead', {data});
+    toast(`Lead cadastrado (ID ${res.id})`);
+    closeModal($('modal-new-lead'));
+    setTimeout(() => loadLeads(), 1500);
+  }catch(err){
+    toast(err.message, 'error');
+  }finally{
+    setBtnLoading(btn, false);
+  }
+});
 document.addEventListener('keydown', e => {if(e.key === 'Escape') closeDrawer()});
 
 // ==========================================================================
@@ -2046,7 +2244,9 @@ if(CFG.BRAND_NAME){
 applyWriteMode();
 initTheme();
 load();
+loadLeads();
 setInterval(load, REFRESH_MIN*60*1000);
+setInterval(loadLeads, REFRESH_MIN*60*1000);
 </script>
 </body>
 </html>

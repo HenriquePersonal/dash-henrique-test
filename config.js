@@ -12,6 +12,10 @@ window.GARBO_CONFIG = {
   //   → Publicar → copiar URL aqui
   CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMb8trSPg3Q7u80QZlvFOIHfTbnwjcm3OX7aEPM9wJoXmegkPpngTC1XXSWnzDfsBjTPcL-OvxMAaa/pub?gid=2002507662&single=true&output=csv',
 
+  // 2b) URL do CSV publicado da aba LEADS
+  // Como obter: mesma sequência acima, mas selecionar aba "LEADS"
+  LEADS_CSV_URL: '',
+
   // 2) URL do Apps Script publicado (endpoint que escreve na planilha)
   // Como obter: na planilha → Extensões → Apps Script
   //   → Cole o conteúdo de apps-script.gs → Salvar
