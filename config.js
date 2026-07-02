@@ -18,7 +18,7 @@ window.GARBO_CONFIG = {
 
   // 2c) URL do CSV publicado da aba PERSONAL
   // Como obter: mesma sequência acima, mas selecionar aba "PERSONAL"
-  PERSONAL_CSV_URL: '',
+  PERSONAL_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMb8trSPg3Q7u80QZlvFOIHfTbnwjcm3OX7aEPM9wJoXmegkPpngTC1XXSWnzDfsBjTPcL-OvxMAaa/pub?gid=992531349&single=true&output=csv',
 
   // 2) URL do Apps Script publicado (endpoint que escreve na planilha)
   // Como obter: na planilha → Extensões → Apps Script
