@@ -119,7 +119,7 @@ input,select,button{font-family:inherit}
 .dq-alert button:hover{background:rgba(251,191,36,.12)}
 
 /* SUMMARY */
-.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem}
+.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:1rem}
 @media (max-width:1280px){.summary{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:768px){.summary{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:480px){.summary{grid-template-columns:1fr}}
@@ -495,6 +495,7 @@ table.data .muted{color:var(--text-mute)}
       <a href="#sec-students"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M3 21v-1a6 6 0 0 1 12 0v1"/><circle cx="17" cy="9" r="3"/><path d="M21 21v-1a4 4 0 0 0-3-3.87"/></svg>Alunos</a>
       <a href="#sec-novos"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/><path d="M19 8v6"/></svg>Novos do mês</a>
       <a href="#sec-leads"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Leads</a>
+      <a href="#sec-personal"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>Personal</a>
 
       <div class="nav-header">Análise</div>
       <a href="#sec-history"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg>Histórico</a>
@@ -523,6 +524,7 @@ table.data .muted{color:var(--text-mute)}
         <a href="#sec-students">Alunos</a>
         <a href="#sec-novos">Novos</a>
         <a href="#sec-leads">Leads</a>
+        <a href="#sec-personal">Personal</a>
       </nav>
       <div class="header-spacer"></div>
       <div class="search-box">
@@ -558,9 +560,16 @@ table.data .muted{color:var(--text-mute)}
       <section class="summary" id="sec-summary" aria-label="Métricas principais">
         <article class="spotlight metric" data-spotlight>
           <div class="metric-icon"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 5-5"/></svg></div>
-          <div class="label">MRR</div>
+          <div class="label">MRR (Consultoria)</div>
           <div class="value"><span class="pre">R$</span><span id="mrr-num">—</span></div>
-          <div class="sub" id="mrr-sub">receita mensal recorrente</div>
+          <div class="sub" id="mrr-sub">receita variável recorrente</div>
+        </article>
+
+        <article class="spotlight metric" data-spotlight>
+          <div class="metric-icon amber"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></div>
+          <div class="label">Renda Fixa (Personal)</div>
+          <div class="value"><span class="pre">R$</span><span id="fixa-num">—</span></div>
+          <div class="sub" id="fixa-sub">alunos presenciais ativos</div>
         </article>
 
         <article class="spotlight metric" data-spotlight>
@@ -810,7 +819,52 @@ table.data .muted{color:var(--text-mute)}
         </div>
       </section>
 
-      <p class="note">MRR exclui Parceria, Presencial e Vitalício. Cache do Sheets ~5 min. Clique em qualquer aluno para detalhes.</p>
+      <!-- PERSONAL -->
+      <section class="panel" id="sec-personal" aria-label="Alunos de Personal">
+        <div class="panel-head">
+          <div class="panel-title">Personal <span class="count" id="personal-count"></span></div>
+          <div class="panel-tools">
+            <select id="personal-filter-status" style="font-size:12px;padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text)">
+              <option value="">Todos os status</option>
+              <option>Ativo</option>
+              <option>Vencido</option>
+              <option>Cancelado</option>
+            </select>
+            <button class="cta" id="btn-new-personal" type="button" data-needs-script style="font-size:12px;padding:.3rem .8rem">
+              <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              Novo aluno Personal
+            </button>
+          </div>
+        </div>
+        <div class="kpi-strip" id="personal-kpis" style="margin-bottom:1rem">
+          <div class="mini"><div class="lbl">Renda fixa</div><div class="v green" id="personal-renda">—</div><div class="sub">soma dos ativos</div></div>
+          <div class="mini"><div class="lbl">Ativos</div><div class="v" id="personal-ativos">—</div><div class="sub">alunos presenciais</div></div>
+          <div class="mini"><div class="lbl">Vencendo semana</div><div class="v amber" id="personal-vencendo">—</div><div class="sub">próximos 7 dias</div></div>
+          <div class="mini"><div class="lbl">Vencidos</div><div class="v rose" id="personal-vencidos">—</div><div class="sub">precisam renovar</div></div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+                <th>Objetivo</th>
+                <th>Data início</th>
+                <th>Valor</th>
+                <th>Vencimento</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="personal-tbody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="personal-empty" hidden>Nenhum aluno de Personal cadastrado ainda. Clique em "Novo aluno Personal" para começar.</div>
+        <div class="empty" id="personal-no-csv" hidden style="color:var(--amber)">
+          ⚠️ Configure <b>PERSONAL_CSV_URL</b> em config.js para visualizar os alunos de Personal. Publique a aba PERSONAL da planilha como CSV (Arquivo → Compartilhar → Publicar na web → aba PERSONAL → CSV).
+        </div>
+      </section>
+
+      <p class="note">MRR exclui Parceria, Presencial e Vitalício. Renda Fixa (Personal) soma o VALOR dos alunos Personal ativos. Cache do Sheets ~5 min. Clique em qualquer aluno para detalhes.</p>
 
     </div>
   </div>
@@ -1109,6 +1163,56 @@ table.data .muted{color:var(--text-mute)}
   </div>
 </div>
 
+<!-- MODAL: NOVO ALUNO PERSONAL -->
+<div class="modal-bg" id="modal-new-personal" data-modal>
+  <div class="modal" role="dialog" aria-labelledby="modal-personal-title">
+    <div class="modal-head">
+      <div>
+        <h3 id="modal-personal-title">Novo aluno Personal</h3>
+        <div class="sub">cadastra direto na planilha (renda fixa)</div>
+      </div>
+      <button class="drawer-close" data-close type="button" aria-label="Fechar">×</button>
+    </div>
+    <form id="form-new-personal" class="modal-body">
+      <div class="field">
+        <label class="required">Nome</label>
+        <input name="NOME" required placeholder="Nome completo">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Telefone</label>
+          <input name="TELEFONE" type="tel" placeholder="5511999999999">
+        </div>
+        <div class="field">
+          <label>Data início</label>
+          <input name="DATA_INICIO" type="date">
+        </div>
+      </div>
+      <div class="field">
+        <label>Objetivo</label>
+        <input name="OBJETIVO" placeholder="ex: hipertrofia, emagrecimento…">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label class="required">Valor (R$)</label>
+          <input name="VALOR" type="number" min="0" step="0.01" required placeholder="0,00">
+        </div>
+        <div class="field">
+          <label>Vencimento</label>
+          <input name="VENCIMENTO" type="date">
+        </div>
+      </div>
+    </form>
+    <div class="modal-foot">
+      <button type="button" class="btn-cancel" data-close>Cancelar</button>
+      <button type="submit" class="btn-submit" form="form-new-personal" id="btn-personal-submit">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M20 6 9 17l-5-5"/></svg>
+        Cadastrar
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1118,6 +1222,7 @@ table.data .muted{color:var(--text-mute)}
 <script>
 const CFG = window.GARBO_CONFIG || {};
 const LEADS_CSV_URL = CFG.LEADS_CSV_URL || '';
+const PERSONAL_CSV_URL = CFG.PERSONAL_CSV_URL || '';
 
 // ==========================================================================
 // AUTH
@@ -1245,6 +1350,65 @@ function renderLeads(){
   }).join('');
 }
 
+// PERSONAL
+let personalRows = [];
+const personalFilters = { status: '' };
+
+async function loadPersonal(){
+  if(!PERSONAL_CSV_URL){
+    $('personal-no-csv').hidden = false;
+    $('personal-empty').hidden = true;
+    return;
+  }
+  $('personal-no-csv').hidden = true;
+  try{
+    const url = PERSONAL_CSV_URL + (PERSONAL_CSV_URL.includes('?') ? '&' : '?') + 'cb=' + Date.now();
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const parsed = Papa.parse(text, {header:true, skipEmptyLines:true});
+    personalRows = (parsed.data || []).filter(r => (r.NOME || '').trim());
+    renderPersonal();
+    renderSummary();
+    renderUrgents();
+  }catch(err){
+    console.error('Personal:', err);
+  }
+}
+
+function renderPersonal(){
+  let filtered = personalRows;
+  if(personalFilters.status) filtered = filtered.filter(r => (r.STATUS||'').trim() === personalFilters.status);
+
+  const ativos = personalRows.filter(r => (r.STATUS||'').trim() === 'Ativo');
+  const renda = ativos.reduce((s,r) => s + parseValor(r.VALOR), 0);
+  const vencendo = ativos.filter(r => { const d = diasAte(parseDate(r.VENCIMENTO)); return d != null && d >= 0 && d <= 7 });
+  const vencidos = ativos.filter(r => { const d = diasAte(parseDate(r.VENCIMENTO)); return d != null && d < 0 });
+
+  $('personal-count').textContent = `(${filtered.length})`;
+  $('personal-renda').textContent = fmtMoney(renda);
+  $('personal-ativos').textContent = ativos.length;
+  $('personal-vencendo').textContent = vencendo.length;
+  $('personal-vencidos').textContent = vencidos.length;
+
+  const STATUS_CLS = {'ativo':'ativo','vencido':'vencido','cancelado':'cancelado'};
+  const tbody = $('personal-tbody');
+  $('personal-empty').hidden = filtered.length > 0;
+  tbody.innerHTML = filtered.map(r => {
+    const sk = (r.STATUS||'').toLowerCase();
+    const cls = STATUS_CLS[sk] || '';
+    return `<tr>
+      <td class="nome">${escapeHtml(r.NOME||'—')}</td>
+      <td class="mono muted">${escapeHtml(r.TELEFONE||'—')}</td>
+      <td class="muted">${escapeHtml(r.OBJETIVO||'—')}</td>
+      <td class="mono muted">${escapeHtml(r.DATA_INICIO||'—')}</td>
+      <td class="num">${r.VALOR ? fmtMoney(parseValor(r.VALOR)) : '—'}</td>
+      <td class="mono muted">${escapeHtml(r.VENCIMENTO||'—')}</td>
+      <td><span class="status ${cls}"><span class="dot"></span>${escapeHtml(r.STATUS||'—')}</span></td>
+    </tr>`;
+  }).join('');
+}
+
 const fmt = n => Math.round(n).toLocaleString('pt-BR');
 const fmtMoney = n => 'R$ ' + fmt(n);
 function parseValor(v){
@@ -1346,6 +1510,11 @@ function renderSummary(){
   $('mrr-num').textContent = fmt(mrr);
   $('mrr-sub').textContent = `${ativos.length} ativos · ${mrrContribs.length} contribuem`;
 
+  const personalAtivos = personalRows.filter(r => (r.STATUS||'').trim() === 'Ativo');
+  const rendaFixa = personalAtivos.reduce((s,r) => s + parseValor(r.VALOR), 0);
+  $('fixa-num').textContent = fmt(rendaFixa);
+  $('fixa-sub').textContent = `${personalAtivos.length} aluno${personalAtivos.length===1?'':'s'} presencia${personalAtivos.length===1?'l':'is'}`;
+
   const today = new Date();
   const ymNow = ymOf(today);
   const lastMonth = new Date(today.getFullYear(),today.getMonth()-1,1);
@@ -1391,8 +1560,14 @@ function renderSummary(){
 // URGENTS
 function renderUrgents(){
   const ativos = rows.filter(r => (r.STATUS||'').trim() === 'Ativo');
-  const today = ativos.map(r => ({...r, dias: diasAte(getVenc(r))})).filter(r => r.dias != null && r.dias <= 0);
-  const week = ativos.map(r => ({...r, dias: diasAte(getVenc(r))})).filter(r => r.dias != null && r.dias > 0 && r.dias <= 7);
+  const ativosPersonal = personalRows.filter(r => (r.STATUS||'').trim() === 'Ativo');
+
+  const consultoria = ativos.map(r => ({...r, dias: diasAte(getVenc(r)), _origin:'consultoria'}));
+  const personal = ativosPersonal.map(r => ({...r, dias: diasAte(parseDate(r.VENCIMENTO)), _origin:'personal', PLANO: 'Personal · ' + (r.OBJETIVO || '—')}));
+
+  const combined = [...consultoria, ...personal];
+  const today = combined.filter(r => r.dias != null && r.dias <= 0);
+  const week = combined.filter(r => r.dias != null && r.dias > 0 && r.dias <= 7);
   today.sort((a,b) => a.dias - b.dias);
   week.sort((a,b) => a.dias - b.dias);
 
@@ -1406,23 +1581,28 @@ function renderUrgents(){
   for(const div of document.querySelectorAll('.urgent-row')){
     div.addEventListener('click', () => {
       const id = div.dataset.id;
+      if(div.dataset.origin === 'personal'){
+        const r = personalRows.find(x => (x.ID || x.NOME) === id);
+        if(r) toast(`${r.NOME} · ${r.TELEFONE || 'sem telefone'} · ${r.OBJETIVO || ''}`);
+        return;
+      }
       const r = rows.find(x => (x.ID || x.NOME) === id);
       if(r) openDrawer(r);
     });
   }
 }
 function urgentRow(r, kind){
-  const venc = getVenc(r);
+  const venc = r._origin === 'personal' ? parseDate(r.VENCIMENTO) : getVenc(r);
   const vencStr = venc ? venc.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '—';
   const valor = parseValor(r.VALOR);
   const lbl = r.dias < 0 ? `atrasado ${-r.dias}d` : (r.dias === 0 ? 'hoje' : (r.dias === 1 ? 'amanhã' : `${r.dias}d`));
   const id = r.ID || r.NOME;
-  return `<div class="urgent-row" data-id="${escapeHtml(id)}">
+  return `<div class="urgent-row" data-id="${escapeHtml(id)}" data-origin="${r._origin}">
     <div>
       <div class="nm">${escapeHtml(r.NOME)}</div>
       <div class="meta">${escapeHtml(r.PLANO || '—')} · ${vencStr} · ${lbl}</div>
     </div>
-    <div class="vl">${valor ? fmtMoney(valor) : '—'}<small>${escapeHtml(r.RENOVOU_VEZES||'0')} renov.</small></div>
+    <div class="vl">${valor ? fmtMoney(valor) : '—'}<small>${r._origin === 'personal' ? 'personal' : (escapeHtml(r.RENOVOU_VEZES||'0') + ' renov.')}</small></div>
   </div>`;
 }
 
@@ -1936,7 +2116,7 @@ function updateThemeIcon(){
 }
 
 // EVENTS
-$('refresh').addEventListener('click', () => { load(true); loadLeads(); });
+$('refresh').addEventListener('click', () => { load(true); loadLeads(); loadPersonal(); });
 $('retry').addEventListener('click', () => load(true));
 $('novos-prev').addEventListener('click', () => { novosOffset--; renderNovosMes(); });
 $('novos-next').addEventListener('click', () => { if(novosOffset < 0){ novosOffset++; renderNovosMes(); } });
@@ -1995,6 +2175,30 @@ $('form-new-lead').addEventListener('submit', async e => {
     toast(`Lead cadastrado (ID ${res.id})`);
     closeModal($('modal-new-lead'));
     setTimeout(() => loadLeads(), 1500);
+  }catch(err){
+    toast(err.message, 'error');
+  }finally{
+    setBtnLoading(btn, false);
+  }
+});
+$('personal-filter-status').addEventListener('change', e => { personalFilters.status = e.target.value; renderPersonal(); });
+$('btn-new-personal').addEventListener('click', () => {
+  const f = $('form-new-personal');
+  f.reset();
+  f.elements.DATA_INICIO.value = new Date().toISOString().slice(0,10);
+  openModal('modal-new-personal');
+  setTimeout(() => f.elements.NOME.focus(), 100);
+});
+$('form-new-personal').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('btn-personal-submit');
+  const data = formData(e.target);
+  setBtnLoading(btn, true);
+  try{
+    const res = await api('addPersonal', {data});
+    toast(`Aluno Personal cadastrado (ID ${res.id})`);
+    closeModal($('modal-new-personal'));
+    setTimeout(() => loadPersonal(), 1500);
   }catch(err){
     toast(err.message, 'error');
   }finally{
@@ -2245,8 +2449,10 @@ applyWriteMode();
 initTheme();
 load();
 loadLeads();
+loadPersonal();
 setInterval(load, REFRESH_MIN*60*1000);
 setInterval(loadLeads, REFRESH_MIN*60*1000);
+setInterval(loadPersonal, REFRESH_MIN*60*1000);
 </script>
 </body>
 </html>

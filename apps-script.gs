@@ -22,9 +22,11 @@
 
 const SHEET_NAME = 'ALUNOS';
 const LEADS_SHEET_NAME = 'LEADS';
+const PERSONAL_SHEET_NAME = 'PERSONAL';
 const SECRET_TOKEN = '6867772bb7b317013dec88bcaba72f73eaf38c53';
 
 const LEADS_HEADERS = ['ID','NOME','TELEFONE','ORIGEM','DATA_CONTATO','STATUS','OBSERVACOES'];
+const PERSONAL_HEADERS = ['ID','NOME','TELEFONE','OBJETIVO','DATA_INICIO','VALOR','VENCIMENTO','STATUS'];
 
 // Headers da aba ALUNOS — ordem importa, não mexer
 const HEADERS = [
@@ -63,6 +65,9 @@ function doPost(e) {
       case 'addLead':      result = addLead(body.data); break;
       case 'updateLead':   result = updateLead(body.id, body.data); break;
       case 'deleteLead':   result = deleteLead(body.id); break;
+      case 'addPersonal':      result = addPersonal(body.data); break;
+      case 'updatePersonal':   result = updatePersonal(body.id, body.data); break;
+      case 'deletePersonal':   result = deletePersonal(body.id); break;
       default: throw new Error('Ação desconhecida: ' + action);
     }
 
@@ -300,6 +305,67 @@ function deleteLead(id) {
   const sheet = getLeadsSheet();
   const rowNum = findLeadRowById(sheet, id);
   if (!rowNum) throw new Error('Lead ID ' + id + ' não encontrado');
+  sheet.deleteRow(rowNum);
+  return { id, deleted: true };
+}
+
+// ==========================================================================
+// PERSONAL
+// ==========================================================================
+
+function getPersonalSheet() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(PERSONAL_SHEET_NAME);
+  if (!sheet) throw new Error('Aba "' + PERSONAL_SHEET_NAME + '" não encontrada na planilha');
+  return sheet;
+}
+
+function getLastPersonalId(sheet) {
+  const last = sheet.getLastRow();
+  if (last < 2) return 0;
+  const ids = sheet.getRange(2, 1, last - 1, 1).getValues().flat();
+  return Math.max(...ids.map(v => Number(v) || 0), 0);
+}
+
+function findPersonalRowById(sheet, id) {
+  const last = sheet.getLastRow();
+  if (last < 2) return null;
+  const ids = sheet.getRange(2, 1, last - 1, 1).getValues().flat();
+  const idx = ids.findIndex(v => String(v) === String(id));
+  return idx >= 0 ? idx + 2 : null;
+}
+
+function addPersonal(data) {
+  const sheet = getPersonalSheet();
+  const newId = getLastPersonalId(sheet) + 1;
+  const hoje = formatDate(new Date());
+  const row = PERSONAL_HEADERS.map(h => {
+    switch (h) {
+      case 'ID':           return newId;
+      case 'DATA_INICIO':  return data.DATA_INICIO ? formatDate(parseDate(data.DATA_INICIO)) : hoje;
+      case 'VENCIMENTO':   return data.VENCIMENTO ? formatDate(parseDate(data.VENCIMENTO)) : '';
+      case 'STATUS':       return data.STATUS || 'Ativo';
+      default:             return data[h] || '';
+    }
+  });
+  sheet.appendRow(row);
+  return { id: newId };
+}
+
+function updatePersonal(id, data) {
+  const sheet = getPersonalSheet();
+  const rowNum = findPersonalRowById(sheet, id);
+  if (!rowNum) throw new Error('Aluno Personal ID ' + id + ' não encontrado');
+  for (const [key, val] of Object.entries(data)) {
+    const col = PERSONAL_HEADERS.indexOf(key) + 1;
+    if (col > 0) sheet.getRange(rowNum, col).setValue(val);
+  }
+  return { id };
+}
+
+function deletePersonal(id) {
+  const sheet = getPersonalSheet();
+  const rowNum = findPersonalRowById(sheet, id);
+  if (!rowNum) throw new Error('Aluno Personal ID ' + id + ' não encontrado');
   sheet.deleteRow(rowNum);
   return { id, deleted: true };
 }
