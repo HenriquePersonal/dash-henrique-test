@@ -14,7 +14,7 @@ window.GARBO_CONFIG = {
 
   // 2b) URL do CSV publicado da aba LEADS
   // Como obter: mesma sequência acima, mas selecionar aba "LEADS"
-  LEADS_CSV_URL: '',
+  LEADS_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQMb8trSPg3Q7u80QZlvFOIHfTbnwjcm3OX7aEPM9wJoXmegkPpngTC1XXSWnzDfsBjTPcL-OvxMAaa/pub?gid=1187508675&single=true&output=csv',
 
   // 2) URL do Apps Script publicado (endpoint que escreve na planilha)
   // Como obter: na planilha → Extensões → Apps Script
