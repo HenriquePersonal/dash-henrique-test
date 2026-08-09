@@ -1,4 +1,4 @@
-# Garbo CRM — Dashboard de alunos
+# HB Fit CRM — Dashboard de alunos
 
 Dashboard web pra personal trainer / consultor online gerenciar alunos, renovações, MRR e churn. Lê dados ao vivo de uma planilha Google Sheets e permite cadastrar / renovar / mudar status direto pelo dash (sem abrir o Sheets).
 
@@ -68,10 +68,10 @@ Esta etapa é o que permite o dash gravar na planilha. Sem isso, o dash funciona
 1. Na planilha: **Extensões → Apps Script**
 2. Apague o código padrão (`function myFunction() {...}`)
 3. Cole o conteúdo inteiro do arquivo [`apps-script.gs`](apps-script.gs) deste repo
-4. **Salvar** (ícone de disquete) → nome do projeto: **GarboCRM**
+4. **Salvar** (ícone de disquete) → nome do projeto: **HBFitCRM**
 5. **Implantar → Nova implantação**
    - Tipo: **App da Web**
-   - Descrição: `API GarboCRM`
+   - Descrição: `API HBFitCRM`
    - Executar como: **Eu** (seu email)
    - Quem pode acessar: **Qualquer pessoa**
 6. **Implantar** → autoriza (vai pedir permissão pra editar a planilha)
@@ -84,7 +84,7 @@ Esta etapa é o que permite o dash gravar na planilha. Sem isso, o dash funciona
 Abra o arquivo [`config.js`](config.js) no seu editor (ou direto no GitHub) e cole as 2 URLs:
 
 ```javascript
-window.GARBO_CONFIG = {
+window.HBFIT_CONFIG = {
   CSV_URL: 'COLE_AQUI_a_URL_do_passo_3',
   APPS_SCRIPT_URL: 'COLE_AQUI_a_URL_do_passo_4',
   // ...

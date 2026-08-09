@@ -58,7 +58,7 @@ Pergunte: **"Você recebeu uma planilha Google Sheets transferida? Ou vai criar 
 
 #### Caso B — Vai criar do zero
 - Manda ele acessar https://sheets.new
-- Renomear pra "Garbo CRM" (ou nome livre)
+- Renomear pra "HB Fit CRM" (ou nome livre)
 - Renomear primeira aba pra **`ALUNOS`** (case-sensitive, exato)
 - Colar na linha 1 estes cabeçalhos (uma coluna cada):
   ```
@@ -99,17 +99,17 @@ A planilha veio com o Apps Script dentro, mas autorizado pela conta antiga. Ele 
 6. **Versão**: troca pra **"Nova versão"**
 7. **Implantar** → vai pedir reautorização → autoriza com a conta dele (Avançado → Acessar → Permitir)
 8. **Copia a URL nova** (a URL pode ter mudado!)
-9. Testa: abre a URL no navegador — deve responder `{"ok":true,"message":"Garbo CRM API. Use POST."}`
+9. Testa: abre a URL no navegador — deve responder `{"ok":true,"message":"HB Fit CRM API. Use POST."}`
 
 #### Caso B — Planilha criada do zero (Apps Script ainda não existe)
 
 1. Na planilha: **Extensões → Apps Script**
 2. Apaga `function myFunction() {}` que vier por padrão
 3. Cola o conteúdo do arquivo **`apps-script.gs`** deste repo (pega via `Read` tool ou pede pra ele copiar do GitHub)
-4. **Ctrl+S** → nome do projeto: **GarboCRM**
+4. **Ctrl+S** → nome do projeto: **HBFitCRM**
 5. **Implantar → Nova implantação**
    - Engrenagem ⚙️ → **App da Web**
-   - Descrição: `API GarboCRM`
+   - Descrição: `API HBFitCRM`
    - Executar como: **Eu**
    - Quem pode acessar: **Qualquer pessoa** ⚠️ (sem isso o dash não consegue chamar)
 6. **Implantar** → autoriza com a conta dele (Avançado → Acessar → Permitir)

@@ -38,7 +38,7 @@ Após aceitar, a planilha aparece em "Minhas unidades" no seu Drive.
 ### Opção B — Criar planilha nova do zero
 
 1. Acesse https://sheets.new
-2. Renomeie pra **"Garbo CRM"** (ou outro nome)
+2. Renomeie pra **"HB Fit CRM"** (ou outro nome)
 3. Renomeie a primeira aba pra **`ALUNOS`** (clique com botão direito na aba > Renomear)
 4. Cole na **linha 1** os cabeçalhos abaixo (cada um numa coluna):
 
@@ -82,14 +82,14 @@ Esta é a etapa que mais tem detalhe — siga com calma.
 2. Vai abrir um editor com `function myFunction() {}`. **Apague tudo.**
 3. Volte no GitHub do seu fork → abra o arquivo **`apps-script.gs`** → clique em **Raw** (canto superior direito) → **Ctrl+A** + **Ctrl+C**
 4. Cole no editor do Apps Script
-5. **Ctrl+S** pra salvar → quando pedir nome do projeto: **`GarboCRM`**
+5. **Ctrl+S** pra salvar → quando pedir nome do projeto: **`HBFitCRM`**
 
 ### 4.2 Implantar como Web App
 
 1. Botão azul **Implantar → Nova implantação**
 2. Engrenagem ⚙️ ao lado de "Selecionar tipo" → escolhe **App da Web**
 3. Preenche:
-   - **Descrição:** `API GarboCRM`
+   - **Descrição:** `API HBFitCRM`
    - **Executar como:** **Eu** (seu email)
    - **Quem pode acessar:** **Qualquer pessoa** ⚠️ (sem isso o dash não consegue chamar)
 4. **Implantar**
@@ -101,7 +101,7 @@ Vai aparecer "Autorizar acesso":
 1. Escolhe sua conta Google
 2. Aviso "Google não verificou este app" (normal, é seu próprio script)
 3. Clica em **Avançado** (canto inferior esquerdo)
-4. **Acessar GarboCRM (não seguro)**
+4. **Acessar HBFitCRM (não seguro)**
 5. **Permitir**
 
 ### 4.4 Copiar URL
@@ -116,7 +116,7 @@ https://script.google.com/macros/s/AKfycbx................/exec
 
 ✅ **OK quando:** você abre essa URL no navegador e vê:
 ```json
-{"ok":true,"message":"Garbo CRM API. Use POST."}
+{"ok":true,"message":"HB Fit CRM API. Use POST."}
 ```
 
 ---
@@ -130,7 +130,7 @@ No seu fork no GitHub:
 3. Substitui as 2 URLs pelas suas:
 
 ```javascript
-window.GARBO_CONFIG = {
+window.HBFIT_CONFIG = {
   CSV_URL: 'COLE_AQUI_a_URL_do_passo_3',
   APPS_SCRIPT_URL: 'COLE_AQUI_a_URL_do_passo_4',
   REFRESH_INTERVAL_MIN: 5,

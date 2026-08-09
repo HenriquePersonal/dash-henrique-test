@@ -4,7 +4,7 @@
 // Edite os 2 valores abaixo com os seus. Tudo o resto funciona automaticamente.
 // ==========================================================================
 
-window.GARBO_CONFIG = {
+window.HBFIT_CONFIG = {
 
   // 1) URL do CSV publicado da aba ALUNOS
   // Como obter: na planilha → Arquivo → Compartilhar → Publicar na web

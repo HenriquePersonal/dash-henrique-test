@@ -1,5 +1,5 @@
 // ==========================================================================
-// GARBO CRM — Apps Script
+// HB FIT CRM — Apps Script
 // ==========================================================================
 // Este código fica DENTRO da planilha (Extensões > Apps Script).
 // Ele expõe endpoints que o dashboard usa pra escrever na planilha
@@ -7,10 +7,10 @@
 //
 // SETUP (1x):
 //   1. Cole este código inteiro no editor Apps Script da SUA planilha
-//   2. Salvar (ícone disquete) → Nome do projeto: "GarboCRM"
+//   2. Salvar (ícone disquete) → Nome do projeto: "HBFitCRM"
 //   3. Implantar → Nova implantação
 //        - Tipo: Web app
-//        - Descrição: API GarboCRM
+//        - Descrição: API HBFitCRM
 //        - Executar como: Eu (seu email)
 //        - Quem pode acessar: Qualquer pessoa
 //   4. Autorizar (vai pedir permissão pra editar a planilha)
@@ -78,7 +78,7 @@ function doPost(e) {
 }
 
 function doGet() {
-  return jsonResponse({ ok: true, message: 'Garbo CRM API. Use POST.' });
+  return jsonResponse({ ok: true, message: 'HB Fit CRM API. Use POST.' });
 }
 
 function jsonResponse(obj) {
@@ -428,4 +428,46 @@ function formatDate(d) {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   const yy = d.getFullYear();
   return `${dd}/${mm}/${yy}`;
+}
+
+// ==========================================================================
+// NOTIFICAÇÃO DE NOVO FORMULÁRIO
+// ==========================================================================
+// Manda um email na hora que alguém preenche o formulário de anamnese
+// (aba "Respostas ao formulário 1"), pra não depender de checar manualmente.
+//
+// SETUP (1x, além de colar este código):
+//   1. No editor Apps Script, ícone de relógio (Acionadores) na barra lateral
+//   2. + Adicionar acionador
+//        - Função a executar: notificarNovoFormulario
+//        - Fonte do evento: Do Google Sheets
+//        - Tipo do evento: Ao enviar formulário
+//   3. Salvar → autorizar (vai pedir permissão de enviar email)
+//
+// E-mail configurado abaixo — troque se quiser mandar pra outro endereço.
+// ==========================================================================
+
+const EMAIL_NOTIFICACAO = 'nunesbispo011@gmail.com';
+
+function notificarNovoFormulario(e) {
+  const valores = e.namedValues || {};
+  const pega = (chave) => (valores[chave] && valores[chave][0]) || '';
+
+  const nome = pega('Nome Completo') || '(nome não preenchido)';
+  const whatsapp = pega('WhatsApp');
+  const plano = pega('Qual plano você contratou?');
+  const valor = pega('Quanto você pagou pelo plano? (apenas o número, ex: 297)');
+
+  const assunto = `Novo formulário: ${nome}`;
+  const corpo = [
+    `${nome} acabou de preencher o formulário.`,
+    '',
+    whatsapp ? `WhatsApp: ${whatsapp}` : null,
+    plano ? `Plano: ${plano}` : null,
+    valor ? `Valor: ${valor}` : null,
+    '',
+    'Responda esta conversa com o Claude confirmando se pode rodar o onboarding.',
+  ].filter(Boolean).join('\n');
+
+  MailApp.sendEmail(EMAIL_NOTIFICACAO, assunto, corpo);
 }
