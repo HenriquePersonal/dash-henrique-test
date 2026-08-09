@@ -27,7 +27,7 @@ window.HBFIT_CONFIG = {
   //   → Executar como: Eu / Quem pode acessar: Qualquer pessoa
   //   → Implantar → copiar URL aqui (termina em /exec)
   // Se não configurado, os botões de ação ficam desabilitados (modo somente-leitura).
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxmj2Ojl1vgguWELgrLQyd5lQsIjeoDJBJujCt0uxV2QE-rSdWcE7maZDPk7l52tKEhew/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwf4QYCMQ3AxWIK76LkuixFsNCvPTQHG5b7eYDt3_Mx0BRW0lVuy0JUQ4M08gbncOb8Xw/exec',
 
   // ----- Não precisa mexer daqui pra baixo -----
 
