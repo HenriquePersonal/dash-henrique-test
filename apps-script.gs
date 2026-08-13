@@ -33,7 +33,7 @@ const HEADERS = [
   'ID','NOME','DATA_INICIO','PLANO','DATA_INICIO_CICLO','VENCIMENTO',
   'VALOR','FORMA_PGTO','STATUS','ONBOARDING_OK','RENOVOU_VEZES','UPSELL',
   'ORIGEM','CONGELADO_ATE','MOTIVO_SAIDA','ULTIMA_INTERACAO','OBSERVACOES',
-  'EMAIL','TELEFONE','DATA_NASCIMENTO'
+  'EMAIL','TELEFONE','DATA_NASCIMENTO','OBJETIVO','LESAO'
 ];
 
 // Duração dos planos (em meses) — pra calcular vencimento
@@ -118,7 +118,9 @@ function createAluno(data) {
       case 'RENOVOU_VEZES': return data.RENOVOU_VEZES || 0;
       case 'UPSELL': return data.UPSELL || 'FALSE';
       case 'ONBOARDING_OK': return data.ONBOARDING_OK || 'FALSE';
-      default: return data[h] || '';
+      // Usa == null (não ||) para não transformar o número 0 em célula vazia —
+      // alunos de parceria têm VALOR: 0 e precisam gravar zero, não branco.
+      default: return data[h] == null ? '' : data[h];
     }
   });
 
@@ -450,7 +452,7 @@ function formatDate(d) {
 const EMAIL_NOTIFICACAO = 'nunesbispo011@gmail.com';
 
 function notificarNovoFormulario(e) {
-  const valores = e.namedValues || {};
+  const valores = (e && e.namedValues) || {};
   const pega = (chave) => (valores[chave] && valores[chave][0]) || '';
 
   const nome = pega('Nome Completo') || '(nome não preenchido)';
