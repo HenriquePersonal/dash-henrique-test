@@ -47,4 +47,10 @@ window.HBFIT_CONFIG = {
 
   // Link do botão "Abrir planilha" da sidebar (substitua se quiser apontar pra outra)
   SHEET_URL: 'https://docs.google.com/spreadsheets/d/19c1cJnNJvlLXI4wRB1HRWrgJxkFTh6dPJPDh2dppALQ/edit',
+
+  // Receitas que não são plano de aluno (não entram no CRM nem no MRR), mas
+  // somam na "Receita do mês" e no gráfico mensal. Data em DD/MM/AAAA.
+  RECEITAS_EXTRAS: [
+    { data: '26/10/2026', descricao: 'Entradas do desafio (repasse da Paloma)', valor: 1288 },
+  ],
 };

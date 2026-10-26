@@ -1502,6 +1502,14 @@ function renderAll(){
   renderNovosMes();
 }
 
+// Receitas fora do CRM (config.js → RECEITAS_EXTRAS) do mês `ym` (valor de ymOf)
+function extrasDoMes(ym){
+  return (CFG.RECEITAS_EXTRAS || []).reduce((s, e) => {
+    const d = parseDate(e.data);
+    return d && ymOf(d) === ym ? s + (Number(e.valor) || 0) : s;
+  }, 0);
+}
+
 // SUMMARY
 function renderSummary(){
   const ativos = rows.filter(r => (r.STATUS||'').trim() === 'Ativo');
@@ -1522,10 +1530,11 @@ function renderSummary(){
 
   const vendasMes = rows.filter(r => { const d = parseDate(r.DATA_INICIO); return d && ymOf(d)===ymNow });
   const vendasLast = rows.filter(r => { const d = parseDate(r.DATA_INICIO); return d && ymOf(d)===ymLast });
-  const recMes = vendasMes.reduce((s,r) => s + parseValor(r.VALOR), 0);
-  const recLast = vendasLast.reduce((s,r) => s + parseValor(r.VALOR), 0);
+  const extrasMes = extrasDoMes(ymNow);
+  const recMes = vendasMes.reduce((s,r) => s + parseValor(r.VALOR), 0) + extrasMes;
+  const recLast = vendasLast.reduce((s,r) => s + parseValor(r.VALOR), 0) + extrasDoMes(ymLast);
   $('rec-mes').textContent = fmt(recMes);
-  $('rec-mes-sub').textContent = `${vendasMes.length} venda${vendasMes.length===1?'':'s'} este mês`;
+  $('rec-mes-sub').textContent = `${vendasMes.length} venda${vendasMes.length===1?'':'s'} este mês` + (extrasMes ? ` + R$ ${fmt(extrasMes)} extra` : '');
   const deltaEl = $('rec-mes-delta');
   if(recLast > 0){
     const pct = Math.round(((recMes-recLast)/recLast)*100);
@@ -1688,6 +1697,12 @@ function renderCharts(){
     if(!ini) continue;
     const key = `${ini.getFullYear()}-${String(ini.getMonth()+1).padStart(2,'0')}`;
     if(bucketByKey[key]){bucketByKey[key].recVal += parseValor(r.VALOR); bucketByKey[key].count++}
+  }
+  for(const e of (CFG.RECEITAS_EXTRAS || [])){
+    const d = parseDate(e.data);
+    if(!d) continue;
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if(bucketByKey[key]) bucketByKey[key].recVal += Number(e.valor) || 0;
   }
   destroyChart('receita');
   charts.receita = new Chart($('chartReceita'), {
