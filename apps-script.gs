@@ -26,7 +26,10 @@ const PERSONAL_SHEET_NAME = 'PERSONAL';
 const SECRET_TOKEN = '6867772bb7b317013dec88bcaba72f73eaf38c53';
 
 const LEADS_HEADERS = ['ID','NOME','TELEFONE','ORIGEM','DATA_CONTATO','STATUS','OBSERVACOES'];
-const PERSONAL_HEADERS = ['ID','NOME','TELEFONE','OBJETIVO','DATA_INICIO','VALOR','VENCIMENTO','STATUS'];
+// MOTIVO_SAIDA adicionada em 21/09/2026: a aba ALUNOS já tinha o campo e a PERSONAL não,
+// então motivo de saída de aluno presencial se perdia. Primeiro caso: Beatriz Quadros,
+// que saiu por conflito com o horário de trabalho.
+const PERSONAL_HEADERS = ['ID','NOME','TELEFONE','OBJETIVO','DATA_INICIO','VALOR','VENCIMENTO','STATUS','MOTIVO_SAIDA'];
 
 // Headers da aba ALUNOS — ordem importa, não mexer
 const HEADERS = [
@@ -42,6 +45,17 @@ const DURACAO = {
   'Trimestral Black': 6, 'Semestral Black': 12, 'Anual Black': 24,
   'Mensal': 1, 'Bimestral': 2,
 };
+
+// Planos que não vencem: ficam sem VENCIMENTO de propósito
+const SEM_VENCIMENTO = ['Parceria', 'Presencial', 'Vitalício'];
+
+// Plano novo precisa estar em DURACAO (ou em SEM_VENCIMENTO) antes de ser usado.
+// Sem isso o vencimento sairia vazio ou velho, sem aviso.
+function exigirPlanoConhecido(plano) {
+  if (plano && !DURACAO[plano] && SEM_VENCIMENTO.indexOf(plano) === -1) {
+    throw new Error('Plano "' + plano + '" sem duração cadastrada. Adicione em DURACAO no apps-script.gs (e no index.html) antes de usar.');
+  }
+}
 
 // ==========================================================================
 // ENDPOINT PRINCIPAL
@@ -102,6 +116,7 @@ function createAluno(data) {
   const plano = (data.PLANO || '').trim();
   const inicioCiclo = data.DATA_INICIO_CICLO ? parseDate(data.DATA_INICIO_CICLO) : dataInicio;
   let vencimento = data.VENCIMENTO ? parseDate(data.VENCIMENTO) : null;
+  if (!vencimento) exigirPlanoConhecido(plano);
 
   if (!vencimento && DURACAO[plano] && inicioCiclo) {
     vencimento = new Date(inicioCiclo);
@@ -139,6 +154,7 @@ function renewAluno(id, data) {
   const novoPlano = (data.PLANO || current.PLANO || '').trim();
   const inicioCiclo = data.DATA_INICIO_CICLO ? parseDate(data.DATA_INICIO_CICLO) : new Date();
   let vencimento = data.VENCIMENTO ? parseDate(data.VENCIMENTO) : null;
+  if (!vencimento) exigirPlanoConhecido(novoPlano);
 
   if (!vencimento && DURACAO[novoPlano]) {
     vencimento = new Date(inicioCiclo);
@@ -149,7 +165,7 @@ function renewAluno(id, data) {
   const updates = {
     PLANO: novoPlano,
     DATA_INICIO_CICLO: formatDate(inicioCiclo),
-    VENCIMENTO: vencimento ? formatDate(vencimento) : current.VENCIMENTO,
+    VENCIMENTO: vencimento ? formatDate(vencimento) : '',
     RENOVOU_VEZES: renovs,
     STATUS: 'Ativo',
     ULTIMA_INTERACAO: formatDate(new Date()),

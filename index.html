@@ -1444,7 +1444,10 @@ function timeAgo(ts){
 }
 function escapeHtml(s){return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function statusKey(s){return (s||'').trim().toLowerCase()}
-function getVenc(r){return parseDate(r.VENCIMENTO) || parseDate(r.DATA_INICIO_CICLO)}
+// Planos que não vencem: sem vencimento por natureza, ficam fora de urgentes e renovações
+const PLANOS_SEM_VENC = ['Parceria','Presencial','Vitalício'];
+function semVencimento(r){return PLANOS_SEM_VENC.includes((r.PLANO||'').trim())}
+function getVenc(r){return semVencimento(r) ? null : parseDate(r.VENCIMENTO)}
 function ymOf(d){return d.getFullYear()*100 + d.getMonth()}
 function ymStr(d){return d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'/'+String(d.getFullYear()).slice(2)}
 
@@ -1880,13 +1883,15 @@ function renderNovosMes(){
 // DATA QUALITY
 function renderDataQuality(){
   const ativos = rows.filter(r => (r.STATUS||'').trim() === 'Ativo');
-  const semValor = ativos.filter(r => !parseValor(r.VALOR) && (r.PLANO||'').trim() && !['Parceria','Vitalício','Presencial'].includes((r.PLANO||'').trim())).length;
+  const semValor = ativos.filter(r => !parseValor(r.VALOR) && (r.PLANO||'').trim() && !PLANOS_SEM_VENC.includes((r.PLANO||'').trim())).length;
   const semPlano = ativos.filter(r => !(r.PLANO||'').trim()).length;
   const semOrigem = ativos.filter(r => !(r.ORIGEM||'').trim()).length;
+  const semVenc = ativos.filter(r => !semVencimento(r) && !getVenc(r) && String(r.ONBOARDING_OK||'').trim().toUpperCase() === 'TRUE').length;
   const issues = [];
   if(semValor) issues.push({label:`${semValor} sem valor`, key:'sem-valor'});
   if(semPlano) issues.push({label:`${semPlano} sem plano`, key:'sem-plano'});
   if(semOrigem) issues.push({label:`${semOrigem} sem origem`, key:'sem-origem'});
+  if(semVenc) issues.push({label:`${semVenc} sem vencimento`, key:'sem-venc'});
 
   if(!issues.length){$('dq-alert').hidden = true; return}
   $('dq-alert').hidden = false;
@@ -1946,9 +1951,10 @@ function filteredRows(){
     }
     if(dqFilter){
       const plano = (r.PLANO||'').trim();
-      if(dqFilter === 'sem-valor' && (parseValor(r.VALOR) || ['Parceria','Vitalício','Presencial'].includes(plano) || !plano)) return false;
+      if(dqFilter === 'sem-valor' && (parseValor(r.VALOR) || PLANOS_SEM_VENC.includes(plano) || !plano)) return false;
       if(dqFilter === 'sem-plano' && plano) return false;
       if(dqFilter === 'sem-origem' && (r.ORIGEM||'').trim()) return false;
+      if(dqFilter === 'sem-venc' && (semVencimento(r) || getVenc(r) || String(r.ONBOARDING_OK||'').trim().toUpperCase() !== 'TRUE')) return false;
     }
     return true;
   });
@@ -1993,7 +1999,7 @@ function renderStudents(){
   const tbody = $('stu-tbody');
   tbody.innerHTML = filtered.map(r => {
     const venc = getVenc(r);
-    const vencStr = venc ? fmtDateBR(venc) : '—';
+    const vencStr = venc ? fmtDateBR(venc) : (semVencimento(r) ? 'sem vencimento' : '—');
     const valor = parseValor(r.VALOR);
     const status = (r.STATUS||'').trim() || '—';
     const id = r.ID || r.NOME;
@@ -2003,7 +2009,7 @@ function renderStudents(){
       <td class="nome">${escapeHtml(r.NOME)}</td>
       <td class="muted">${escapeHtml(r.PLANO || '—')}</td>
       <td class="num">${valor ? fmtMoney(valor) : '—'}</td>
-      <td><span class="status ${statusKey(status)}"><span class="dot"></span>${escapeHtml(status)}</span></td>
+      <td><span class="status ${escapeHtml(statusKey(status))}"><span class="dot"></span>${escapeHtml(status)}</span></td>
       <td class="mono">${vencStr}</td>
       <td class="num">${escapeHtml(r.RENOVOU_VEZES || '0')}</td>
       <td class="muted">${escapeHtml(r.ORIGEM || '—')}</td>
@@ -2068,9 +2074,9 @@ function openDrawer(r, sourceTr){
   const items = [
     ['ID', r.ID, 'mono'],['Data de início', fmtDateBR(parseDate(r.DATA_INICIO)), 'mono'],
     ['Plano', r.PLANO || '—', 'text'],['Início do ciclo', fmtDateBR(parseDate(r.DATA_INICIO_CICLO)), 'mono'],
-    ['Vencimento', fmtDateBR(venc) + (dias != null ? ` <span style="color:var(--text-fade)">(${dias>0?dias+' d':dias===0?'hoje':-dias+' d atrás'})</span>` : ''), 'mono html'],
+    ['Vencimento', (venc ? fmtDateBR(venc) : (semVencimento(r) ? 'sem vencimento' : '—')) + (dias != null ? ` <span style="color:var(--text-fade)">(${dias>0?dias+' d':dias===0?'hoje':-dias+' d atrás'})</span>` : ''), 'mono html'],
     ['Valor', valor ? fmtMoney(valor) : '—', 'mono'],['Forma de pgto', r.FORMA_PGTO || '—', 'text'],
-    ['Status', `<span class="status ${statusKey(r.STATUS)}"><span class="dot"></span>${escapeHtml(r.STATUS||'—')}</span>`, 'text html'],
+    ['Status', `<span class="status ${escapeHtml(statusKey(r.STATUS))}"><span class="dot"></span>${escapeHtml(r.STATUS||'—')}</span>`, 'text html'],
     ['Onboarding', r.ONBOARDING_OK || '—', 'mono'],['Renovações', r.RENOVOU_VEZES || '0', 'mono'],
     ['Upsell', r.UPSELL || '—', 'mono'],['Origem', r.ORIGEM || '—', 'text'],
     ['Congelado até', fmtDateBR(parseDate(r.CONGELADO_ATE)), 'mono'],
