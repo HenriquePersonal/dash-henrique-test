@@ -864,7 +864,7 @@ table.data .muted{color:var(--text-mute)}
         </div>
       </section>
 
-      <p class="note">MRR exclui Parceria, Presencial e Vitalício. Renda Fixa (Personal) soma o VALOR dos alunos Personal ativos. Cache do Sheets ~5 min. Clique em qualquer aluno para detalhes.</p>
+      <p class="note">MRR e receita excluem Parceria, Presencial, Vitalício e Permuta. Renda Fixa (Personal) soma o VALOR dos alunos Personal ativos. Cache do Sheets ~5 min. Clique em qualquer aluno para detalhes.</p>
 
     </div>
   </div>
@@ -957,7 +957,7 @@ table.data .muted{color:var(--text-mute)}
           <label>Forma de pgto</label>
           <select name="FORMA_PGTO">
             <option value="">—</option>
-            <option>PIX</option><option>Cartão</option><option>Boleto</option><option>Outro</option>
+            <option>PIX</option><option>Cartão</option><option>Boleto</option><option>Permuta</option><option>Outro</option>
           </select>
         </div>
         <div class="field">
@@ -1017,7 +1017,7 @@ table.data .muted{color:var(--text-mute)}
           <label>Forma de pgto</label>
           <select name="FORMA_PGTO">
             <option value="">—</option>
-            <option>PIX</option><option>Cartão</option><option>Boleto</option><option>Outro</option>
+            <option>PIX</option><option>Cartão</option><option>Boleto</option><option>Permuta</option><option>Outro</option>
           </select>
         </div>
       </div>
@@ -1447,6 +1447,10 @@ function statusKey(s){return (s||'').trim().toLowerCase()}
 // Planos que não vencem: sem vencimento por natureza, ficam fora de urgentes e renovações
 const PLANOS_SEM_VENC = ['Parceria','Presencial','Vitalício'];
 function semVencimento(r){return PLANOS_SEM_VENC.includes((r.PLANO||'').trim())}
+// Permuta (FORMA_PGTO contém "Permuta"): plano pago com bem/serviço, não entra dinheiro.
+// VALOR guarda o valor do plano, mas fica fora de MRR e receita.
+function ehPermuta(r){return /permuta/i.test(r.FORMA_PGTO||'')}
+function valorCaixa(r){return ehPermuta(r) ? 0 : parseValor(r.VALOR)}
 function getVenc(r){return semVencimento(r) ? null : parseDate(r.VENCIMENTO)}
 function ymOf(d){return d.getFullYear()*100 + d.getMonth()}
 function ymStr(d){return d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','')+'/'+String(d.getFullYear()).slice(2)}
@@ -1516,7 +1520,7 @@ function extrasDoMes(ym){
 // SUMMARY
 function renderSummary(){
   const ativos = rows.filter(r => (r.STATUS||'').trim() === 'Ativo');
-  const mrrContribs = ativos.filter(r => DURACAO[(r.PLANO||'').trim()]);
+  const mrrContribs = ativos.filter(r => DURACAO[(r.PLANO||'').trim()] && !ehPermuta(r));
   const mrr = mrrContribs.reduce((s,r) => s + parseValor(r.VALOR)/DURACAO[(r.PLANO||'').trim()], 0);
   $('mrr-num').textContent = fmt(mrr);
   $('mrr-sub').textContent = `${ativos.length} ativos · ${mrrContribs.length} contribuem`;
@@ -1534,8 +1538,8 @@ function renderSummary(){
   const vendasMes = rows.filter(r => { const d = parseDate(r.DATA_INICIO); return d && ymOf(d)===ymNow });
   const vendasLast = rows.filter(r => { const d = parseDate(r.DATA_INICIO); return d && ymOf(d)===ymLast });
   const extrasMes = extrasDoMes(ymNow);
-  const recMes = vendasMes.reduce((s,r) => s + parseValor(r.VALOR), 0) + extrasMes;
-  const recLast = vendasLast.reduce((s,r) => s + parseValor(r.VALOR), 0) + extrasDoMes(ymLast);
+  const recMes = vendasMes.reduce((s,r) => s + valorCaixa(r), 0) + extrasMes;
+  const recLast = vendasLast.reduce((s,r) => s + valorCaixa(r), 0) + extrasDoMes(ymLast);
   $('rec-mes').textContent = fmt(recMes);
   $('rec-mes-sub').textContent = `${vendasMes.length} venda${vendasMes.length===1?'':'s'} este mês` + (extrasMes ? ` + R$ ${fmt(extrasMes)} extra` : '');
   const deltaEl = $('rec-mes-delta');
@@ -1699,7 +1703,7 @@ function renderCharts(){
     const ini = parseDate(r.DATA_INICIO);
     if(!ini) continue;
     const key = `${ini.getFullYear()}-${String(ini.getMonth()+1).padStart(2,'0')}`;
-    if(bucketByKey[key]){bucketByKey[key].recVal += parseValor(r.VALOR); bucketByKey[key].count++}
+    if(bucketByKey[key]){bucketByKey[key].recVal += valorCaixa(r); bucketByKey[key].count++}
   }
   for(const e of (CFG.RECEITAS_EXTRAS || [])){
     const d = parseDate(e.data);
@@ -1840,7 +1844,7 @@ function renderNovosMes(){
 
   $('novos-count').textContent = novos.length ? `(${novos.length})` : '';
 
-  const receita = novos.reduce((s, r) => s + parseValor(r.VALOR), 0);
+  const receita = novos.reduce((s, r) => s + valorCaixa(r), 0);
   const ticket = novos.length ? receita / novos.length : 0;
 
   $('novos-kpi-total').textContent = novos.length;
